@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-bvp), ui-sans-serif, system-ui, sans-serif;
+  --color-paper: #f8f6f1;
+  --color-paper-2: #f0ece3;
+  --color-ink: #141414;
+  --color-ink-2: #2b2b2b;
+  --color-muted: #6a655c;
+  --color-rule: #e2ddd1;
+  --color-accent: #c8102e;
+  --color-accent-dark: #9e0b23;
+  --color-night: #0f1114;
+  --color-gold: #e2a400;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-feature-settings: "kern", "liga";
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #ffe08a;
+  color: #141414;
+}
+
+/* Headline hover: subtle underline like premium news sites */
+.hl {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.35s ease;
+}
+.group:hover .hl,
+.hl:hover {
+  background-size: 100% 1px;
+}
+
+.kicker {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.img-zoom img {
+  transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.4s ease;
+}
+.group:hover .img-zoom img {
+  transform: scale(1.04);
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+}
+.live-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* Article typography */
+.article-body {
+  font-family: var(--font-serif);
+  font-size: 1.24rem;
+  line-height: 1.75;
+  color: #1d1d1d;
+}
+.article-body p {
+  margin: 0 0 1.35em;
+}
+.article-body > p:first-of-type::first-letter {
+  float: left;
+  font-size: 4.4em;
+  line-height: 0.82;
+  padding: 0.08em 0.12em 0 0;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+.article-body h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.3rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 2em 0 0.7em;
+  color: #111;
+}
+.article-body ul {
+  margin: 0 0 1.4em;
+  padding: 0;
+  list-style: none;
+}
+.article-body li {
+  position: relative;
+  padding-left: 1.4em;
+  margin-bottom: 0.55em;
+}
+.article-body li::before {
+  content: "";
+  position: absolute;
+  left: 0.2em;
+  top: 0.72em;
+  width: 0.45em;
+  height: 0.45em;
+  background: var(--color-accent);
+}
+.article-body strong {
+  font-weight: 650;
+}
+.article-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .article-body {
+    font-size: 1.12rem;
+  }
+}

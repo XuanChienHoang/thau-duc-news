@@ -1,0 +1,623 @@
+import { sql } from "drizzle-orm";
+import { db } from "@/db";
+import { articles, type NewArticle } from "@/db/schema";
+import { IMAGES } from "./categories";
+
+type Seed = Omit<NewArticle, "publishedAt"> & { hoursAgo: number };
+
+const SEEDS: Seed[] = [
+  {
+    slug: "hai-quoc-tich-nguoi-viet-o-duc-can-biet-gi",
+    title: "Được giữ hai quốc tịch: người Việt ở Đức cần chuẩn bị gì trước khi nộp hồ sơ nhập tịch",
+    sapo: "Cánh cửa giữ song tịch Đức và Việt Nam đã mở từ khi đạo luật quốc tịch sửa đổi có hiệu lực, gỡ bỏ nỗi trăn trở lớn nhất của nhiều thế hệ xa xứ. Thế nhưng đằng sau tấm hộ chiếu màu đỏ bóc-đô vẫn là những tiêu chí xét duyệt tài chính và hội nhập ngày càng khắt khe mà người nộp đơn không thể chủ quan.",
+    category: "di-tru",
+    kind: "guide",
+    featured: true,
+    relevance: 42,
+    lawStatus: "co-hieu-luc",
+    audienceTargets: ["cu-tru-quoc-tich", "gia-dinh", "nguoi-di-lam"],
+    image: IMAGES.migration.src,
+    imageCredit: IMAGES.migration.credit,
+    tags: ["quốc tịch Đức", "song tịch", "Einbürgerung", "Staatsangehörigkeitsgesetz", "cư trú"],
+    keyPoints: [
+      "Luật Quốc tịch sửa đổi (StARModG) chính thức cho phép công dân nhập tịch Đức giữ lại quốc tịch gốc mà không cần xin giấy thôi quốc tịch Việt Nam.",
+      "Thời gian cư trú hợp pháp tiêu chuẩn rút từ 8 năm xuống còn 5 năm; diện nhập tịch siêu tốc 3 năm đã bị Quốc hội khóa mới bãi bỏ.",
+      "Điều kiện tự chủ tài chính (Lebensunterhaltssicherung) được siết rất chặt: người đang nhận trợ cấp từ Jobcenter hoặc Sozialamt hầu như rất khó vượt qua vòng thẩm định.",
+      "Người lao động hợp đồng thời Đông Đức cũ (Vertragsarbeiter) và thế hệ thuyền nhân lớn tuổi được hưởng quy định nới lỏng về chứng chỉ ngoại ngữ.",
+    ],
+    vnImpact:
+      "Với hơn 200.000 người gốc Việt tại Đức, quy định chấp nhận song tịch giúp bà con vừa có đầy đủ quyền bầu cử, đi lại và bảo hộ công dân của CHLB Đức, vừa giữ trọn sợi dây pháp lý với quê hương, tài sản thừa kế và gia đình tại Việt Nam. Tuy nhiên, lượng hồ sơ tồn đọng tại các Sở Quốc tịch đang ở mức kỷ lục, đòi hỏi sự chuẩn bị giấy tờ tỉ mỉ ngay từ ngày đầu.",
+    glossary: [
+      {
+        term: "Staatsangehörigkeitsgesetz (StAG)",
+        vi: "Luật Quốc tịch Đức",
+        explain: "Đạo luật nền tảng quy định điều kiện để một người nước ngoài trở thành công dân CHLB Đức, vừa trải qua đợt cải tổ lớn nhất trong hơn hai thập kỷ.",
+      },
+      {
+        term: "Lebensunterhaltssicherung",
+        vi: "Khả năng tự đảm bảo sinh kế",
+        explain: "Điều kiện bắt buộc chứng minh bạn và gia đình sống bằng thu nhập từ lương hoặc kinh doanh, không phụ thuộc vào trợ cấp xã hội (Bürgergeld/Grundsicherung).",
+      },
+      {
+        term: "Einbürgerungstest",
+        vi: "Bài thi kiến thức nhập tịch",
+        explain: "Bài trắc nghiệm gồm 33 câu hỏi về lịch sử, hệ thống pháp luật và đời sống xã hội Đức; người thi cần trả lời đúng tối thiểu 17 câu trong 60 phút.",
+      },
+      {
+        term: "Untätigkeitsklage",
+        vi: "Đơn kiện hành chính vì chậm trễ",
+        explain: "Công cụ pháp lý cho phép người nộp đơn nhờ tòa án hành chính can thiệp nếu cơ quan chức năng ngâm hồ sơ quá hạn luật định mà không có lý do chính đáng.",
+      },
+    ],
+    body: `Nếu có dịp ngồi uống tách cà phê ở khu chợ Đồng Xuân (Berlin) hay ghé qua một tiệm tạp hóa người Việt tại München những tháng gần đây, câu chuyện được bàn tán nhiều nhất không còn là chuyện giá rau tươi hay vé máy bay về Tết, mà là câu hỏi quen thuộc: "Nhà mình đã nộp hồ sơ lấy quốc tịch Đức chưa?". Trong suốt hàng chục năm qua, hàng chục nghìn cô chú và anh chị người Việt dù đã sống ở Đức hai, ba mươi năm, đóng thuế đều đặn và cầm thẻ định cư vĩnh viễn (Niederlassungserlaubnis) trong tay nhưng vẫn ngần ngại bước qua cánh cửa nhập tịch. Lý do lớn nhất nằm ở quy định cũ bắt buộc phải từ bỏ quốc tịch Việt Nam.
+
+Cảm giác phải ký vào tờ đơn xin thôi quốc tịch gốc giống như việc tự tay cắt đi một nhịp cầu nối với quê cha đất tổ, chưa kể những rắc rối thực tế về giấy tờ nhà đất, thừa kế hay mỗi lần muốn về Việt Nam thăm bố mẹ già lại phải xin visa. Kể từ khi Luật Hiện đại hóa Quốc tịch (Staatsangehörigkeitsmodernisierungsgesetz) có hiệu lực, nút thắt tâm lý và pháp lý lớn nhất ấy đã chính thức được tháo gỡ. Nước Đức giờ đây chấp nhận đa quốc tịch như một nguyên tắc chung.
+
+## Cánh cửa mở rộng hơn nhưng chiếc khóa thẩm định lại chặt hơn
+
+Để hình dung đúng bản chất của đợt thay đổi luật này, bà con cứ tưởng tượng cổng vào ngôi nhà quốc tịch Đức trước đây vừa xây tường cao (yêu cầu 8 năm cư trú, buộc bỏ quốc tịch gốc), nhưng chiếc khóa kiểm tra thu nhập bên trong đôi khi còn có những khoảng châm chước. Bây giờ, chính phủ liên bang hạ bức tường thời gian xuống còn 5 năm và bỏ rào cản song tịch, nhưng đổi lại, chiếc khóa kiểm tra năng lực tài chính và cam kết giá trị dân chủ lại được gia cố bằng thép cứng hơn rất nhiều.
+
+Chính trường Berlin đã tranh luận cực kỳ gay gắt về vấn đề này. Liên minh cầm quyền khẳng định rằng hộ chiếu Đức là phần thưởng cho những người thực sự hội nhập và đóng góp vào hệ thống kinh tế thông qua lao động. Do đó, điều kiện tự trang trải cuộc sống theo Điều 10 Luật Quốc tịch được áp dụng nghiêm ngặt hơn trước. Ngay cả diện "nhập tịch nhanh sau 3 năm" dành cho người có thành tích hội nhập xuất sắc từng được đưa vào luật hồi giữa năm 2024 cũng đã bị Quốc hội khóa mới thống nhất bãi bỏ để đảm bảo tính chặt chẽ của toàn hệ thống.
+
+| Tiêu chí xét duyệt | Quy định trước cải cách | Quy định đang áp dụng hiện nay | Ý nghĩa thực tế với người Việt |
+| :--- | :--- | :--- | :--- |
+| Quốc tịch gốc | Bắt buộc phải xin thôi quốc tịch Việt Nam | Được giữ nguyên quốc tịch Việt Nam (Song tịch) | Không mất quyền công dân Việt Nam, thuận lợi khi về quê hương hoặc thừa kế tài sản |
+| Thời gian cư trú | Tối thiểu 8 năm hợp pháp | Tối thiểu 5 năm hợp pháp | Rút ngắn 3 năm chờ đợi cho người đi làm, kỹ sư, điều dưỡng |
+| Trình độ tiếng Đức | Bắt buộc chứng chỉ B1 cho hầu hết mọi diện | B1 cho diện thường; miễn giảm cho thế hệ Vertragsarbeiter lớn tuổi | Các cô chú sang Đức thời Đông Đức cũ chỉ cần giao tiếp đời thường được |
+| Điều kiện tài chính | Có một số ngoại lệ rộng nếu mất việc ngoài ý muốn | Siết chặt: phải tự lo trọn vẹn sinh kế cho bản thân và người phụ thuộc | Hộ kinh doanh và người đi làm cần giữ bảng lương, báo cáo thuế thật sạch |
+
+## Điểm sáng nhân văn dành cho thế hệ cô chú lao động hợp tác Đông Đức cũ
+
+Một trong những điểm đáng quý nhất của đạo luật hiện hành là sự ghi nhận công sức của thế hệ nhập cư đầu tiên, bao gồm các cô chú từng sang Cộng hòa Dân chủ Đức theo diện lao động hợp tác (Vertragsarbeiter) trước năm 1990 cũng như thế hệ thuyền nhân ở Tây Đức. Những năm tháng đầu sau khi bức tường Berlin sụp đổ, hầu hết bà con phải lao vào mưu sinh từ sáng sớm tới đêm khuya ở các quầy hàng, quán ăn để nuôi con ăn học, làm gì có điều kiện ngồi vào lớp học ngữ pháp tiếng Đức để thi lấy bằng B1.
+
+Hiểu được hoàn cảnh lịch sử đó, luật mới miễn trừ yêu cầu chứng chỉ B1 và bài thi quốc tịch (Einbürgerungstest) cho nhóm thế hệ này. Các cô chú chỉ cần chứng minh mình có khả năng giao tiếp bằng lời nói trong đời sống hằng ngày mà không gặp trở ngại đáng kể. Đây là cơ hội vàng để những người đã dành trọn tuổi trẻ trên đất Đức chính thức có được tấm hộ chiếu công dân mà không còn bị rào cản thi cử làm chùn bước.
+
+## Những cạm bẫy hồ sơ khiến đơn xin nhập tịch bị ngâm hàng năm trời
+
+Tại các thành phố lớn như Berlin, München, Hamburg hay Leipzig, số lượng hồ sơ nộp vào đã tăng gấp đôi, gấp ba ngay sau khi luật có hiệu lực. Ở Berlin, dù chính quyền bang đã chuyển sang hệ thống nộp hồ sơ trực tuyến của Trung tâm Quốc tịch thuộc Cơ quan Nhập cư (LEA), thời gian chờ đợi trung bình vẫn kéo dài từ 12 đến 24 tháng. Với người tự kinh doanh như chủ nhà hàng, chủ tiệm nail hay cửa hàng châu Á, vòng thẩm định tài chính thường phức tạp hơn người làm công ăn lương rất nhiều.
+
+Chuyên viên xét duyệt sẽ không chỉ nhìn vào số tiền trong tài khoản ngân hàng hôm nay, mà họ đòi hỏi quyết toán thuế thu nhập cá nhân (Einkommensteuerbescheid) của 2 đến 3 năm gần nhất, xác nhận của cố vấn thuế (Steuerberater) về lợi nhuận ròng, cùng chứng nhận đóng bảo hiểm y tế và phương án tích lũy hưu trí đầy đủ. Một sai sót nhỏ như việc kê khai doanh thu quá thấp trong các năm trước để giảm tiền thuế nay có thể trở thành con dao hai lưỡi: Sở Quốc tịch sẽ đánh giá thu nhập ròng trên giấy tờ không đủ nuôi gia đình và từ chối hồ sơ.
+
+Về phía pháp luật Việt Nam, Luật Quốc tịch Việt Nam không tự động tước quốc tịch của công dân khi họ nhập thêm quốc tịch nước ngoài. Để mọi việc suôn sẻ, bà con cần kiểm tra để cuốn hộ chiếu Việt Nam còn hạn dài, giữ gìn cẩn thận giấy khai sinh bản gốc và trích lục kết hôn đã được hợp pháp hóa lãnh sự. Một bộ hồ sơ được sắp xếp khoa học, trung thực ngay từ đầu chính là tấm vé nhanh nhất đưa gia đình bạn đi qua hành trình pháp lý quan trọng này. Chúc bà con sớm cầm trên tay cuốn hộ chiếu mới mà vẫn giữ vẹn nguyên cội nguồn Việt Nam trong tim.`,
+    hoursAgo: 5,
+  },
+  {
+    slug: "luong-toi-thieu-2026-2027-chu-nha-hang-tiem-nail-can-luu-y",
+    title: "Lương tối thiểu tăng lên 13,90 euro rồi 14,60 euro: bài toán sống còn của chủ nhà hàng và tiệm nail",
+    sapo: "Lộ trình nâng mức lương tối thiểu theo giờ lên 13,90 euro từ năm 2026 và 14,60 euro vào đầu năm 2027 mang lại thêm thu nhập cho người lao động, đồng thời đặt các hộ kinh doanh gia đình người Việt trước áp lực chi phí nhân sự và sự giám sát gắt gao từ lực lượng Hải quan chống làm việc chui.",
+    category: "kinh-te",
+    kind: "guide",
+    relevance: 36,
+    lawStatus: "co-hieu-luc",
+    audienceTargets: ["ho-kinh-doanh", "nguoi-di-lam"],
+    image: IMAGES.work.src,
+    imageCredit: IMAGES.work.credit,
+    tags: ["lương tối thiểu", "Mindestlohn", "Minijob", "hộ kinh doanh", "FKS"],
+    keyPoints: [
+      "Mức lương tối thiểu theo luật định tại Đức tăng lên 13,90 euro/giờ từ ngày 01/01/2026 và tiếp tục tăng lên 14,60 euro/giờ từ ngày 01/01/2027.",
+      "Trần thu nhập của lao động làm thêm diện Minijob tự động được điều chỉnh lên 603 euro/tháng trong năm 2026 và 633 euro/tháng vào năm 2027.",
+      "Ngành ẩm thực (Gastronomie) và làm đẹp (Nagelstudio, Kosmetik) luôn nằm trong danh sách kiểm tra trọng điểm của lực lượng Hải quan (FKS).",
+      "Mức phạt hành chính cho hành vi trả lương thấp hơn mức tối thiểu hoặc gian lận bảng chấm công có thể lên tới 500.000 euro kèm truy thu bảo hiểm xã hội.",
+    ],
+    vnImpact:
+      "Hàng chục nghìn gia đình người Việt tại Đức gắn bó với nghề nhà hàng, quán ăn nhanh và tiệm nail. Mỗi đợt tăng lương tối thiểu đồng nghĩa với việc chủ tiệm phải lập tức yêu cầu cố vấn thuế điều chỉnh hợp đồng Minijob, cập nhật phần mềm chấm công và tái cơ cấu giá bán để không rơi vào bẫy vi phạm pháp luật.",
+    glossary: [
+      {
+        term: "Mindestlohnkommission",
+        vi: "Ủy ban Lương tối thiểu Liên bang",
+        explain: "Hội đồng độc lập gồm đại diện giới chủ và công đoàn tại Đức, họp hai năm một lần để ấn định mức lương sàn bắt buộc trên toàn quốc.",
+      },
+      {
+        term: "Finanzkontrolle Schwarzarbeit (FKS)",
+        vi: "Đơn vị Kiểm soát Tài chính Lao động Chui",
+        explain: "Lực lượng chuyên trách thuộc Tổng cục Hải quan Đức (Zoll), có quyền kiểm tra đột xuất các cơ sở kinh doanh mà không cần báo trước.",
+      },
+      {
+        term: "Geringfügige Beschäftigung (Minijob)",
+        vi: "Việc làm thu nhập nhỏ (Minijob)",
+        explain: "Hình thức lao động phổ biến cho phép người đi làm nhận lương tới mức trần quy định mà không phải đóng thuế thu nhập cá nhân và bảo hiểm thất nghiệp.",
+      },
+      {
+        term: "Arbeitszeitaufzeichnung",
+        vi: "Nghĩa vụ ghi chép giờ làm việc",
+        explain: "Quy định bắt buộc chủ cơ sở trong ngành ăn uống, dịch vụ phải ghi rõ giờ bắt đầu, giờ nghỉ và giờ kết thúc ca làm của từng nhân viên chậm nhất sau 7 ngày.",
+      },
+    ],
+    body: `Mỗi dịp cuối năm, khi những tờ lịch mới chuẩn bị được treo lên tường các quán phở, nhà hàng sushi hay tiệm nail của người Việt khắp nước Đức, cuộc điện thoại quen thuộc nhất mà các chủ tiệm gọi đi thường là cho văn phòng cố vấn thuế (Steuerberater). Câu hỏi lúc nào cũng xoay quanh một con số: "Sang năm lương tối thiểu tăng bao nhiêu và sổ sách của tiệm phải sửa lại thế nào?". Với lộ trình hai bước đã được Ủy ban Lương tối thiểu Liên bang (Mindestlohnkommission) chốt hạ, mức sàn tiền lương theo giờ tại Đức đã bước lên nấc thang 13,90 euro trong năm 2026 và sẽ chạm mốc 14,60 euro ngay từ ngày 1 tháng 1 năm 2027.
+
+Nếu nhìn lại mức 12,00 euro cách đây vài năm hay 12,82 euro của năm 2025, tốc độ tăng tổng cộng hơn 13% chỉ trong hai năm là một cú hích lớn đối với người đi làm hưởng lương. Tuy vậy, với những người đứng mũi chịu sào điều hành một cơ sở kinh doanh nhỏ, đây thực sự là một bài toán cân đối dòng tiền đòi hỏi sự tỉnh táo tuyệt đối.
+
+## Cơ chế chiếc bình thông nhau giữa lương tối thiểu và trần Minijob
+
+Trong hệ thống luật lao động Đức, mức lương tối thiểu và trần thu nhập của diện làm thêm Minijob vận hành giống hệt như hai nhánh của một chiếc bình thông nhau. Từ năm 2022, Quốc hội Đức đã thiết lập công thức động: trần thu nhập Minijob luôn được tính sao cho một người lao động có thể làm việc trung bình 10 giờ mỗi tuần ở mức lương tối thiểu mà không bị mất quyền lợi miễn thuế. Công thức chính xác lấy mức lương tối thiểu nhân với 130 rồi chia cho 3 và làm tròn.
+
+Nhờ cơ chế bình thông nhau ấy, khi lương tối thiểu lên 13,90 euro/giờ, mức trần Minijob tự động nâng lên 603 euro/tháng; và khi lương tối thiểu bước sang mốc 14,60 euro/giờ vào đầu năm 2027, trần Minijob sẽ vọt lên khoảng 633 euro/tháng. Sai lầm phổ biến nhất mà nhiều chủ tiệm người Việt hay mắc phải là giữ nguyên số giờ làm việc cũ trên hợp đồng giấy mà quên kiểm tra xem tích số giữa số giờ và đơn giá lương mới đã vượt trần hay chưa, hoặc ngược lại, trả mức lương cố định theo tháng nhưng số giờ thực tế đứng tiệm lại vượt quá giới hạn cho phép.
+
+| Chỉ số lao động | Mức áp dụng năm 2025 | Mức áp dụng năm 2026 | Mức áp dụng từ 01/01/2027 |
+| :--- | :--- | :--- | :--- |
+| Lương tối thiểu theo giờ (Brutto) | 12,82 euro / giờ | 13,90 euro / giờ | 14,60 euro / giờ |
+| Trần thu nhập Minijob tối đa | 556 euro / tháng | 603 euro / tháng | 633 euro / tháng |
+| Số giờ làm tối đa của diện Minijob | Khoảng 43,3 giờ / tháng | Khoảng 43,3 giờ / tháng | Khoảng 43,3 giờ / tháng |
+| Mức lương tối thiểu một tháng (173 giờ) | Khoảng 2.218 euro | Khoảng 2.405 euro | Khoảng 2.526 euro |
+
+## Vì sao ngành nhà hàng và tiệm nail luôn nằm trong tầm ngắm của Hải quan Đức
+
+Nhiều bà con thường thắc mắc tại sao đoàn kiểm tra của Đơn vị Kiểm soát Tài chính Lao động Chui (Finanzkontrolle Schwarzarbeit - FKS) thuộc Hải quan Đức lại thường xuyên ghé thăm các quán ăn và tiệm làm móng vào đúng khung giờ đông khách nhất chiều thứ Sáu hay thứ Bảy. Thực tế không phải vì sự phân biệt đối xử nào, mà bởi Luật Chống Lao động Chui (Schwarzarbeitsbekämpfungsgesetz) của Đức xếp ngành ẩm thực, khách sạn và dịch vụ chăm sóc sắc đẹp vào nhóm "ngành nghề có rủi ro tiền mặt cao" (Branchen mit erhöhtem Risiko).
+
+Khi cán bộ FKS bước vào tiệm, quy trình kiểm tra của họ giống như việc chụp một bức ảnh cắt lớp ngay tại thời điểm đó: họ ghi lại tên tuổi, thẻ căn cước của toàn bộ những ai đang đứng trong quầy bếp hoặc đang cầm dũa móng cho khách, sau đó đối chiếu ngay lập tức với hệ thống đăng ký bảo hiểm xã hội trực tuyến (Sofortmeldung) và bảng ghi chép giờ làm việc tại chỗ. Có ba lỗi kinh điển khiến các chủ tiệm bị lập biên bản nặng nhất:
+
+- Nhân viên đang làm việc thực tế tại quầy nhưng chưa được gửi thông báo đăng ký tức thời (Sofortmeldung) trước khi bắt đầu ca làm đầu tiên.
+- Bảng chấm công ghi nhân viên chỉ làm từ 10 giờ đến 12 giờ trưa, nhưng lúc 15 giờ chiều đoàn kiểm tra vào vẫn thấy nhân viên đó đang phục vụ khách mà sổ không hề cập nhật.
+- Thỏa thuận miệng trả lương "khoán" theo ngày hoặc theo tuần bằng tiền mặt, khi chia cho tổng số giờ mở cửa của tiệm thì đơn giá mỗi giờ rơi xuống dưới mức 13,90 euro.
+
+## Lời giải bền vững cho các hộ kinh doanh người Việt
+
+Ở Đức, tiền phạt cho hành vi trả dưới mức lương tối thiểu hoặc trốn đóng bảo hiểm xã hội có thể đánh sập tích lũy của cả một gia đình trong nhiều năm, chưa kể việc bị ghi vào hồ sơ vi phạm sẽ trực tiếp chặn đứng con đường gia hạn thẻ cư trú hoặc xin nhập quốc tịch của cả chủ tiệm lẫn người làm.
+
+Thay vì cố gắng cắt xén vài giờ trên giấy tờ để tiết kiệm một khoản nhỏ nhưng mang nỗi phập phồng mỗi khi thấy xe công vụ đỗ trước cửa, các chủ cơ sở nên chủ động ngồi lại với cố vấn thuế ngay từ bây giờ. Hãy rà soát lại toàn bộ phụ lục hợp đồng lao động, đặt quyển sổ hoặc máy tính bảng chấm công ngay tại quầy để nhân viên ký nhận giờ vào - giờ ra mỗi ngày, đồng thời mạnh dạn điều chỉnh bảng giá thực đơn hoặc dịch vụ thêm vài phần trăm một cách minh bạch. Khách hàng ở Đức rất hiểu chuyện chi phí nhân công và năng lượng tăng cao; họ sẵn sàng trả thêm một hoặc hai euro cho một bát phở ngon hay một bộ móng đẹp được làm trong một cửa tiệm đàng hoàng, tuân thủ pháp luật. Chúc các chủ tiệm và anh chị em lao động một năm kinh doanh vững vàng, sổ sách minh bạch và ngủ ngon mỗi tối.`,
+    hoursAgo: 9,
+  },
+  {
+    slug: "the-co-hoi-chancenkarte-cua-moi-cho-nguoi-tre-viet-nam",
+    title: "Thẻ cơ hội (Chancenkarte): giải mã tấm vé tính điểm đưa người trẻ Việt Nam sang Đức tìm việc",
+    sapo: "Lần đầu tiên trong lịch sử di trú hiện đại, CHLB Đức áp dụng hệ thống tính điểm kiểu Canada để cấp visa cho lao động ngoài EU sang Đức tới 12 tháng tìm việc mà không cần hợp đồng trước. Cơ chế này mở ra lối đi rộng rãi nhưng cũng tiềm ẩn nhiều hiểu lầm về chi phí và điều kiện công nhận bằng cấp.",
+    category: "di-tru",
+    kind: "guide",
+    relevance: 32,
+    lawStatus: "co-hieu-luc",
+    audienceTargets: ["du-hoc-hoc-nghe", "cu-tru-quoc-tich", "nguoi-di-lam"],
+    image: IMAGES.train.src,
+    imageCredit: IMAGES.train.credit,
+    tags: ["Chancenkarte", "lao động tay nghề", "Fachkräfteeinwanderung", "visa Đức", "Anabin"],
+    keyPoints: [
+      "Thẻ cơ hội (Chancenkarte) cho phép công dân ngoài EU lưu trú tại Đức tối đa 1 năm để trực tiếp tìm việc làm hoặc nơi nhận đào tạo nghề.",
+      "Trong thời gian tìm việc, người giữ thẻ được phép đi làm thêm tối đa 20 giờ/tuần và làm thử việc (Probearbeit) tối đa 2 tuần tại mỗi công ty.",
+      "Nếu chưa có bằng cấp được Đức công nhận tương đương 100%, ứng viên phải đạt tối thiểu 6 điểm trên thang điểm đánh giá năng lực và độ tuổi.",
+      "Điều kiện bắt buộc là chứng minh tài chính qua tài khoản phong tỏa (Sperrkonto) khoảng hơn 1.027 euro/tháng hoặc có giấy bảo lãnh tài chính hợp lệ tại Đức.",
+    ],
+    vnImpact:
+      "Nhiều gia đình người Việt tại Đức có con cháu ở Việt Nam đã tốt nghiệp đại học, cao đẳng hoặc có tay nghề kỹ thuật muốn sang Đức lập nghiệp. Hiểu đúng thang điểm Chancenkarte giúp gia đình tự chuẩn bị hồ sơ chuẩn xác, tránh mất hàng chục nghìn euro cho các đường dây môi giới thổi phồng sự thật.",
+    glossary: [
+      {
+        term: "Chancenkarte (§ 20a AufenthG)",
+        vi: "Thẻ cơ hội tìm việc",
+        explain: "Giấy phép cư trú đặc biệt theo hệ thống tính điểm thuộc Luật Nhập cư Lao động Tay nghề mới, cho phép sang Đức tìm việc hợp pháp.",
+      },
+      {
+        term: "Sperrkonto",
+        vi: "Tài khoản phong tỏa",
+        explain: "Tài khoản ngân hàng mở tại Đức dùng để chứng minh tài chính khi xin visa; mỗi tháng chủ tài khoản chỉ được rút ra một mức tiền sinh hoạt cố định.",
+      },
+      {
+        term: "Verpflichtungserklärung",
+        vi: "Giấy cam kết bảo lãnh tài chính",
+        explain: "Văn bản pháp lý do người đang sống hợp pháp và có thu nhập cao tại Đức ký tại Sở Ngoại kiều để bảo lãnh toàn bộ chi phí sinh hoạt cho người nộp đơn.",
+      },
+      {
+        term: "ZAB / Anabin",
+        vi: "Cơ quan Công nhận Bằng cấp & Cơ sở dữ liệu Anabin",
+        explain: "Hệ thống chính thức của Đức dùng để tra cứu và thẩm định xem trường đại học, bằng cấp tại Việt Nam có được công nhận tương đương (H+) hay không.",
+      },
+    ],
+    body: `Gần như tuần nào trong các hội nhóm người Việt tại Đức cũng xuất hiện những dòng tin nhắn hỏi thăm từ quê nhà: "Em tốt nghiệp đại học Bách Khoa ở Hà Nội, có kinh nghiệm làm IT ba năm nhưng chưa tìm được công ty Đức nào phỏng vấn từ xa thì có cách nào sang Đức trước rồi xin việc sau không?". Trước đây, câu trả lời thường khá ngặt nghèo vì hệ thống visa truyền thống của Đức đòi hỏi phải có hợp đồng lao động ký sẵn trong tay hoặc quy trình công nhận bằng cấp vô cùng rườm rà.
+
+Bức tranh ấy đã thay đổi căn bản kể từ khi Chính phủ Liên bang triển khai giai đoạn tiếp theo của Luật Nhập cư Lao động Tay nghề (Fachkräfteeinwanderungsgesetz) với điểm nhấn mang tên Thẻ cơ hội (Chancenkarte). Đối mặt với tình trạng thiếu hụt hàng trăm nghìn lao động từ kỹ sư, thợ điện, đầu bếp cho tới nhân viên y tế do dân số già hóa nhanh, Berlin đã quyết định học hỏi mô hình tính điểm của Canada để mở thêm một cánh cửa linh hoạt hơn.
+
+## Hai con đường bước vào Thẻ cơ hội và cách tính 6 điểm chuẩn xác
+
+Để hình dung về Thẻ cơ hội, bạn đọc có thể xem nó như một "tấm thẻ thông hành có điều kiện". Nước Đức chưa trao ngay cho bạn giấy phép cư trú dài hạn, nhưng mở cửa mời bạn vào tận nơi trong 12 tháng, cho phép bạn vừa đi làm thêm 20 giờ mỗi tuần để tự nuôi sống bản thân, vừa đến gõ cửa từng doanh nghiệp để thử việc thực tế tối đa 2 tuần tại mỗi nơi.
+
+Luật quy định hai lối vào rõ rệt. Lối thứ nhất dành cho "người đã có chìa khóa": nếu bạn có bằng đại học hoặc bằng nghề được Đức công nhận tương đương hoàn toàn (Fachkraft), bạn được cấp thẳng Chancenkarte mà không cần cộng điểm hay chứng chỉ ngoại ngữ bắt buộc. Lối thứ hai dành cho đại đa số ứng viên trẻ ở Việt Nam: bạn phải có bằng đào tạo nghề tối thiểu 2 năm hoặc bằng đại học được nhà nước Việt Nam công nhận, có tiếng Đức tối thiểu trình độ A1 (hoặc tiếng Anh trình độ B2), và gom đủ ít nhất 6 điểm từ bảng tiêu chí dưới đây:
+
+| Tiêu chí đánh giá trong thang điểm Chancenkarte | Số điểm cộng | Điều kiện chứng minh trên hồ sơ |
+| :--- | :--- | :--- |
+| Bằng cấp được Đức công nhận một phần (Teilweise Gleichwertigkeit) | +4 điểm | Có quyết định thẩm định của cơ quan chức năng Đức yêu cầu học bổ sung |
+| Ngành nghề thuộc danh sách thiếu hụt nhân lực trầm trọng (Mangelberuf) | +1 điểm | Thuộc nhóm kỹ thuật, IT, điều dưỡng, y tế, xây dựng, giáo dục mầm non |
+| Kinh nghiệm làm việc đúng chuyên môn (3 năm trong 5 năm gần nhất) | +3 điểm | Hợp đồng lao động, sổ bảo hiểm xã hội, xác nhận công tác (2 năm được +2 điểm) |
+| Trình độ tiếng Đức tốt (B2 được +3 điểm, B1 được +2 điểm, A2 được +1 điểm) | +1 đến +3 điểm | Chứng chỉ Goethe-Institut, Telc, ÖSD hoặc TestDaF hợp lệ |
+| Độ tuổi trẻ (Dưới 35 tuổi được +2 điểm; từ 35 đến 40 tuổi được +1 điểm) | +1 đến +2 điểm | Tính theo ngày sinh trên hộ chiếu tại thời điểm nộp hồ sơ xin visa |
+| Có người thân bảo lãnh hoặc từng cư trú hợp pháp tại Đức tối thiểu 6 tháng | +1 điểm | Đã từng du học, trao đổi học thuật hoặc đi kèm vợ/chồng đủ điều kiện |
+
+## Quyền làm thêm 20 giờ mỗi tuần: điểm khác biệt sống còn
+
+So với các loại visa tìm việc cũ từng thất bại vì quá kén người dùng, điểm đột phá thực tế nhất của Chancenkarte nằm ở quyền được đi làm thêm tối đa 20 giờ mỗi tuần ở bất kỳ công việc nào. Với mức lương tối thiểu 13,90 euro/giờ hiện nay, một bạn trẻ chăm chỉ làm thêm 20 giờ mỗi tuần hoàn toàn có thể kiếm được khoảng 1.100 euro mỗi tháng trước thuế. Khoản tiền này đủ để trang trải tiền thuê phòng và ăn uống cơ bản trong thời gian đi phỏng vấn tìm công việc đúng chuyên môn.
+
+Khi tìm được một doanh nghiệp đồng ý ký hợp đồng lao động chính thức phù hợp với bằng cấp hoặc nhận vào học nghề chuyển đổi, người giữ Chancenkarte được phép nộp hồ sơ chuyển đổi thẳng sang giấy phép cư trú lao động ngay tại Sở Ngoại kiều địa phương ở Đức mà không phải bay ngược về Việt Nam xin lại visa từ đầu.
+
+## Tỉnh táo trước bài toán tài chính và các lời chào mời dịch vụ
+
+Dù cánh cửa luật pháp đã mở rộng, rào cản lớn nhất trước khi đặt chân lên máy bay sang Frankfurt hay Berlin vẫn là bài toán chứng minh tài chính và ngoại ngữ. Để được Đại sứ quán Đức tại Hà Nội hoặc Tổng Lãnh sự quán tại TP.HCM cấp visa, người nộp đơn buộc phải mở tài khoản phong tỏa (Sperrkonto) với số tiền hơn 12.300 euro cho một năm, hoặc phải có người thân đang sống và làm việc thu nhập cao tại Đức ra Sở Ngoại kiều ký giấy bảo lãnh tài chính (Verpflichtungserklärung).
+
+Bà con có người nhà ở Việt Nam cần đặc biệt lưu ý một thực tế: tiếng Đức A1 chỉ đủ để qua cửa xét duyệt hồ sơ trên giấy, còn khi bước chân vào phỏng vấn tại doanh nghiệp Đức, nếu không có tiếng Đức từ B1-B2 trở lên (trừ một số vị trí IT thuần tiếng Anh), thời gian 12 tháng sẽ trôi qua rất nhanh trong sự bế tắc. Hãy khuyên các bạn trẻ đầu tư học tiếng Đức thật vững ngay từ khi còn ở Việt Nam và tự mình tra cứu bằng cấp trên cổng thông tin Anabin của chính phủ Đức, thay vì nghe theo những lời quảng cáo "bao đậu thẻ cơ hội không cần học tiếng" với chi phí dịch vụ lên tới cả chục nghìn đô la. Chúc các bạn trẻ Việt Nam chuẩn bị hành trang thật kỹ để biến tấm Thẻ cơ hội thành bước khởi đầu vững chắc trên đất Đức.`,
+    hoursAgo: 20,
+  },
+  {
+    slug: "deutschlandticket-63-euro-co-con-dang-mua",
+    title: "Vé tàu toàn quốc Deutschlandticket tăng lên 63 euro: tính toán sao cho lợi nhất với gia đình người Việt",
+    sapo: "Sau nhiều vòng tranh cãi ngân sách giữa Chính phủ Liên bang và Bộ trưởng Giao thông 16 bang, mức giá chiếc vé tháng quốc dân Deutschlandticket đã bước lên mốc 63 euro. Dù đắt hơn gần 30% so với ngày đầu ra mắt ở mức 49 euro, chiếc vé này vẫn ẩn chứa nhiều cách tối ưu chi phí mà không phải ai cũng biết.",
+    category: "doi-song",
+    kind: "feature",
+    relevance: 24,
+    lawStatus: "co-hieu-luc",
+    audienceTargets: ["gia-dinh", "nguoi-di-lam", "du-hoc-hoc-nghe"],
+    image: IMAGES.life.src,
+    imageCredit: IMAGES.life.credit,
+    tags: ["Deutschlandticket", "Deutsche Bahn", "giao thông công cộng", "Jobticket", "chi phí sinh hoạt"],
+    keyPoints: [
+      "Giá vé tháng toàn quốc Deutschlandticket chính thức áp dụng ở mức 63 euro/tháng kể từ đầu năm 2026 sau quyết định của Hội nghị Bộ trưởng Giao thông các bang.",
+      "Vé có giá trị không giới hạn trên toàn bộ tàu vùng (RE, RB), tàu điện ngầm (U-Bahn), tàu nội đô (S-Bahn), xe điện (Tram) và xe buýt trên khắp 16 bang của Đức.",
+      "Thông qua chương trình vé doanh nghiệp (Jobticket), người lao động có thể giảm giá vé xuống chỉ còn tối đa 44,10 euro/tháng hoặc thấp hơn nữa.",
+      "Deutschlandticket hoạt động theo cơ chế thuê bao tự động gia hạn (Abo); muốn dừng tháng sau bắt buộc phải bấm hủy trước ngày 10 của tháng hiện tại.",
+    ],
+    vnImpact:
+      "Đa số bà con người Việt sống tại các thành phố lớn như Berlin, München, Hamburg, Frankfurt hoặc sống ở vùng ven và đi tàu RE vào trung tâm làm việc mỗi ngày. Việc nắm rõ cơ chế Jobticket, vé học sinh - sinh viên và quy tắc hủy vé trước ngày 10 giúp mỗi gia đình tiết kiệm được hàng trăm euro mỗi năm.",
+    glossary: [
+      {
+        term: "Öffentlicher Personennahverkehr (ÖPNV)",
+        vi: "Hệ thống giao thông công cộng địa phương và vùng",
+        explain: "Bao gồm xe buýt, tàu điện, U-Bahn, S-Bahn và các tuyến tàu vùng (RE, RB); đây là phạm vi được phép sử dụng Deutschlandticket.",
+      },
+      {
+        term: "Fernverkehr (ICE / IC / EC)",
+        vi: "Tàu cao tốc đường dài",
+        explain: "Các đoàn tàu sơn trắng sọc đỏ chạy xuyên bang tốc độ cao của Deutsche Bahn; Deutschlandticket hoàn toàn KHÔNG có giá trị trên các tàu này.",
+      },
+      {
+        term: "Jobticket-Zuschuss",
+        vi: "Khoản trợ giá vé tháng từ chủ lao động",
+        explain: "Khi doanh nghiệp hỗ trợ tối thiểu 25% giá vé cho nhân viên, nhà nước và hiệp hội vận tải sẽ giảm thêm 5% trên tổng giá vé chuẩn.",
+      },
+    ],
+    body: `Sáng đầu tuần đứng trên sân ga S-Bahn Ostkreuz ở Berlin hay ga trung tâm Hauptbahnhof tại Frankfurt, không khó để bắt gặp cảnh những người đi làm vội vã mở điện thoại thông minh, lướt tìm mã QR của tấm vé Deutschlandticket khi nhân viên kiểm표 bước vào toa tàu. Ra đời vào tháng 5 năm 2023 với cái tên quen thuộc "vé 49 euro", tấm vé nhỏ gọn này đã xóa bỏ một trong những cơn ác mộng hành chính lâu đời nhất của nước Đức: rừng ma trận giá vé của hơn 60 hiệp hội giao thông vùng (Verkehrsverbünde) khác nhau.
+
+Thế nhưng câu chuyện ngân sách chưa bao giờ là điều dễ dàng ở Berlin. Khi chi phí điện năng, lương lái tàu và bảo trì đường ray tăng vọt, cuộc giằng co trị giá hàng tỷ euro giữa Chính phủ Liên bang và chính quyền 16 bang đã đẩy mức giá vé tăng từ 49 euro lên 58 euro, và nay chính thức đứng ở con số 63 euro mỗi tháng. Nhiều gia đình người Việt có hai vợ chồng và con lớn cùng đi lại hằng ngày bắt đầu đặt máy tính lên bàn: mỗi tháng cả nhà tốn gần 200 euro tiền vé tàu xe, liệu có còn đáng giữ thuê bao nữa hay không?
+
+## Phép tính thực tế giữa vé lẻ, vé vùng cũ và con số 63 euro
+
+Nếu chỉ nhìn vào mức tăng từ 49 lên 63 euro, cảm giác đắt đỏ là hoàn toàn có thật. Để biết chiếc vé này còn lời hay không, chúng ta phải đặt nó lên bàn cân với giá vé lẻ và vé tháng nội đô truyền thống. Tại các đô thị lớn như München (MVV), Hamburg (HVV) hay Berlin (VBB), một tấm vé lẻ một chiều (Einzelfahrschein) hiện nay đã dao động quanh mức 3,50 đến 4,00 euro. Nghĩa là một người đi làm cả lượt đi lẫn lượt về mất khoảng 7 đến 8 euro mỗi ngày.
+
+| Phương thức đi lại | Chi phí trung bình mỗi tháng | Phạm vi di chuyển được phép | Khi nào nên lựa chọn |
+| :--- | :--- | :--- | :--- |
+| Mua vé lẻ từng chặng (Einzelfahrt) | Khoảng 7,50 euro / ngày đi làm | Chỉ tính cho một chặng đơn lẻ tại một thành phố | Chỉ đi tàu xe dưới 8 ngày mỗi tháng, chủ yếu đi xe hơi hoặc làm việc tại nhà |
+| Vé tháng nội đô truyền thống | Từ 85 đến 120 euro / tháng | Chỉ gói gọn trong một vài vùng (Zone A/B) của 1 thành phố | Hầu như không còn kinh tế trừ khi cần chuyển nhượng vé cho người khác dùng chung |
+| Vé chuẩn Deutschlandticket | 63,00 euro / tháng | Toàn bộ tàu RE, RB, S-Bahn, U-Bahn, Bus trên khắp nước Đức | Đi làm từ 9 ngày/tháng trở lên hoặc cuối tuần hay đi thăm người thân ở bang khác |
+| Vé doanh nghiệp (Jobticket) | Tối đa 44,10 euro / tháng (hoặc thấp hơn) | Giống hệt Deutschlandticket toàn quốc | Người đi làm hưởng lương tại các công ty, bệnh viện, nhà hàng có đăng ký chương trình |
+
+Chỉ cần bạn bước lên tàu xe đi làm khoảng 9 ngày trong một tháng là tiền mua vé lẻ đã vượt qua mốc 63 euro. Chưa kể vào dịp cuối tuần hay ngày nghỉ lễ, thay vì phải mua vé tàu vùng (Länderticket) tốn từ 30 đến 45 euro cho một chuyến đi sang thành phố lân cận thăm bạn bè hay đi chợ châu Á, tấm vé 63 euro trong túi cho phép bạn bước lên bất kỳ chuyến tàu Regional-Express (RE) nào từ Bắc chí Nam nước Đức mà không tốn thêm một xu.
+
+## Những cách hợp pháp để kéo giá vé xuống dưới 45 euro và hai chiếc bẫy cần tránh
+
+Ít người để ý rằng bạn không nhất thiết phải trả đủ 63 euro từ tiền túi của mình. Chính phủ Đức thiết kế một cơ chế khuyến khích rất thông minh mang tên Jobticket: nếu chủ sử dụng lao động (công ty, bệnh viện, xưởng sản xuất hoặc chủ nhà hàng, tiệm nail) đồng ý hỗ trợ ít nhất 25% giá vé (tức khoảng 15,75 euro/tháng), thì nhà nước và đơn vị phát hành vé sẽ giảm thêm 5% nữa. Khi đó, số tiền người lao động thực trả tối đa chỉ còn 44,10 euro/tháng, và khoản hỗ trợ này của chủ cơ sở lại được miễn thuế thu nhập cũng như bảo hiểm xã hội. Với các bạn sinh viên người Việt đang theo học tại các trường đại học Đức, hầu hết các hội sinh viên (Studierendenwerk) đã tích hợp thẳng vé học kỳ (Semesterticket) thành Deutschlandticket với mức phí quy đổi chỉ khoảng 29 đến 38 euro mỗi tháng.
+
+Bên cạnh lợi ích, có hai chiếc bẫy thực tế mà bà con rất hay gặp phải khiến tiền mất oan:
+
+- **Bẫy gia hạn tự động sau ngày 10 hằng tháng:** Deutschlandticket không bán theo kiểu vé lẻ một tháng đứt đoạn mà luôn là hợp đồng thuê bao (Abonnement). Nếu bạn chỉ muốn mua vé cho bố mẹ từ Việt Nam sang chơi một tháng mùa hè, bạn bắt buộc phải bấm nút hủy (Kündigung) trên ứng dụng trước ngày 10 của chính tháng đó. Nếu để qua ngày 11 mới bấm hủy, hệ thống sẽ tự động trừ tiếp 63 euro của tháng kế tiếp mà không có ngoại lệ hoàn tiền.
+- **Bẫy bước nhầm lên tàu trắng ICE/IC:** Một số tuyến tàu đường dài Intercity (IC) đôi khi chạy chung đường ray và dừng ở cùng sân ga với tàu vùng RE. Trừ một vài đoạn tuyến ngoại lệ rất hiếm hoi có thỏa thuận riêng, Deutschlandticket hoàn toàn không có hiệu lực trên các đoàn tàu sơn trắng sọc đỏ (ICE, IC, EC). Bước nhầm lên tàu này mà không mua vé đường dài sẽ bị coi là đi tàu không vé và bị phạt tối thiểu 60 euro hoặc gấp đôi giá vé chuẩn.
+
+Chỉ cần nắm chắc quy tắc "hủy trước ngày 10" và kiểm tra ký hiệu tàu RE/RB trên bảng điện tử trước khi bước lên toa, tấm vé 63 euro vẫn là người bạn đồng hành tiết kiệm và tiện lợi nhất cho các gia đình người Việt trên khắp nước Đức. Chúc bà con luôn có những chuyến tàu đúng giờ và bình an trên mọi nẻo đường đi làm.`,
+    hoursAgo: 30,
+  },
+  {
+    slug: "ho-kinh-doanh-nguoi-viet-hoa-don-dien-tu-may-tinh-tien",
+    title: "Hóa đơn điện tử E-Rechnung và khai báo máy tính tiền TSE: quy định mới chủ tiệm người Việt không thể lơ là",
+    sapo: "Cuộc đại số hóa của ngành thuế CHLB Đức đang đi vào giai đoạn quyết liệt nhất với lộ trình bắt buộc sử dụng hóa đơn điện tử có cấu trúc (E-Rechnung) và nghĩa vụ đăng ký từng chiếc máy tính tiền lên cổng ELSTER. Hiểu đúng lộ trình giúp các chủ nhà hàng, tiệm nail và cửa hàng châu Á tránh những khoản phạt ước tính thuế nặng nề.",
+    category: "luat-moi",
+    kind: "guide",
+    relevance: 35,
+    lawStatus: "co-hieu-luc",
+    audienceTargets: ["ho-kinh-doanh"],
+    image: IMAGES.law.src,
+    imageCredit: IMAGES.law.credit,
+    tags: ["E-Rechnung", "máy tính tiền TSE", "Finanzamt", "thuế Đức", "hộ kinh doanh"],
+    keyPoints: [
+      "Mọi doanh nghiệp và hộ kinh doanh tại Đức hiện đã bắt buộc phải có khả năng tiếp nhận và lưu trữ hóa đơn điện tử theo chuẩn cấu trúc dữ liệu (E-Rechnung).",
+      "Từ ngày 01/01/2027, các doanh nghiệp có doanh thu năm trước trên 800.000 euro bắt buộc phải phát hành E-Rechnung khi giao dịch với đối tác doanh nghiệp (B2B).",
+      "Từ ngày 01/01/2028, nghĩa vụ phát hành hóa đơn điện tử mở rộng ra toàn bộ các cơ sở kinh doanh thông thường trong giao dịch B2B.",
+      "Toàn bộ máy tính tiền điện tử (Kassensystem) phải gắn thiết bị bảo mật TSE và được khai báo định danh đầy đủ với Sở Thuế (Finanzamt) qua hệ thống ELSTER.",
+    ],
+    vnImpact:
+      "Dù tiệm nail hay quán phở chủ yếu phục vụ khách lẻ cá nhân (B2C), các chủ tiệm vẫn phải nhận hóa đơn điện tử từ nhà cung cấp thực phẩm, điện nước, thiết bị và chịu sự giám sát trực tiếp về máy tính tiền TSE. Việc chậm cập nhật phần mềm kế toán có thể khiến cơ quan thuế bác bỏ chi phí đầu vào hoặc ấn định mức thuế ước tính (Schätzung).",
+    glossary: [
+      {
+        term: "E-Rechnung (XRechnung / ZUGFeRD)",
+        vi: "Hóa đơn điện tử có cấu trúc dữ liệu",
+        explain: "Hóa đơn định dạng dữ liệu số theo chuẩn châu Âu EN 16931 để máy tính đọc tự động; một file PDF thông thường gửi qua email không còn được coi là E-Rechnung.",
+      },
+      {
+        term: "Technische Sicherheitseinrichtung (TSE)",
+        vi: "Thiết bị bảo mật kỹ thuật cho máy tính tiền",
+        explain: "Mô-đun phần cứng hoặc đám mây gắn vào máy thu ngân để mã hóa và ghi lại không thể xóa sửa mọi thao tác bấm phím của thu ngân.",
+      },
+      {
+        term: "Kassen-Nachschau",
+        vi: "Kiểm tra đột xuất máy tính tiền",
+        explain: "Quyền hạn cho phép thanh tra Sở Thuế đóng giả khách hàng hoặc bước thẳng vào quầy thu ngân yêu cầu xuất dữ liệu máy tính tiền ngay lập tức mà không cần báo trước.",
+      },
+      {
+        term: "Hinzuschätzung",
+        vi: "Ấn định cộng thêm doanh thu chịu thuế",
+        explain: "Biện pháp trừng phạt tài chính khi sổ sách hoặc máy tính tiền có sai sót: Sở Thuế tự ước tính doanh thu cao hơn thực tế và bắt nộp thuế bổ sung kèm tiền lãi.",
+      },
+    ],
+    body: `Có một sự thật mà bất kỳ ai làm ăn kinh doanh lâu năm ở Đức đều nhận ra: nếu như mười năm trước, việc quản lý giấy tờ của một quán ăn hay một tiệm nail chỉ đơn giản là cuối tháng gom toàn bộ hóa đơn giấy bỏ vào một chiếc hộp giày rồi mang đến giao cho văn phòng cố vấn thuế (Steuerberater), thì ngày nay "chiếc hộp giày" ấy đang dần bước vào viện bảo tàng. Bộ Tài chính Liên bang (BMF) và Sở Thuế các bang đang thực hiện cuộc chuyển đổi số sâu rộng nhất từ trước tới nay nhằm xóa sổ các kẽ hở thất thu thuế.
+
+Hai mũi nhọn pháp lý đang tác động trực tiếp đến từng hộ kinh doanh người Việt chính là quy định bắt buộc về Hóa đơn điện tử (E-Rechnung) theo Luật Cơ hội Tăng trưởng (Wachstumschancengesetz) và cơ chế khai báo định danh toàn bộ hệ thống máy tính tiền điện tử gắn chip bảo mật TSE.
+
+## Đừng nhầm lẫn giữa một file PDF gửi qua email và chuẩn E-Rechnung mới
+
+Khi nghe cụm từ "hóa đơn điện tử", rất nhiều chủ tiệm yên tâm nghĩ rằng: "Nhà cung cấp thực phẩm hay hãng điện vẫn gửi hóa đơn file PDF vào email cho mình suốt mấy năm nay rồi, thế chẳng phải là hóa đơn điện tử hay sao?". Dưới góc độ luật thuế mới của Đức, câu trả lời là không.
+
+Bạn cứ hình dung một tờ hóa đơn giấy hay một file ảnh PDF thông thường giống như bức ảnh chụp một trang sách: con người nhìn vào thì đọc được chữ, nhưng hệ thống máy tính của Sở Thuế muốn kiểm tra thì lại phải dùng phần mềm quét chữ rất dễ nhầm lẫn. Còn chuẩn E-Rechnung mới (áp dụng hai định dạng chuẩn của Đức là XRechnung và ZUGFeRD) là một tệp dữ liệu có cấu trúc XML. Với định dạng ZUGFeRD, bên ngoài bạn vẫn nhìn thấy giao diện giống hệt tờ PDF quen thuộc để đọc bằng mắt thường, nhưng bên trong lõi của tệp tin đã nhúng sẵn toàn bộ mã dữ liệu để phần mềm kế toán và máy chủ Sở Thuế đọc khớp từng con số chỉ trong một phần nghìn giây.
+
+| Mốc thời gian | Quy định pháp lý bắt buộc | Phạm vi áp dụng thực tế với hộ kinh doanh người Việt |
+| :--- | :--- | :--- |
+| Đang áp dụng (Từ 01/01/2025) | Bắt buộc có khả năng NHẬN và lưu trữ E-Rechnung | Mọi tiệm nail, nhà hàng, cửa hàng phải nhận và lưu trữ đúng chuẩn các hóa đơn XML/ZUGFeRD từ nhà cung cấp |
+| Hạn chót 31/07/2025 (Đã qua) | Bắt buộc khai báo định danh máy tính tiền TSE lên ELSTER | Toàn bộ máy thu ngân điện tử đang vận hành phải có mã số đăng ký với Finanzamt; máy mới mua phải khai báo trong 1 tháng |
+| Từ ngày 01/01/2027 | Bắt buộc XUẤT E-Rechnung cho giao dịch B2B (doanh thu > 800.000 €) | Áp dụng cho các chợ đầu mối, công ty nhập khẩu thực phẩm, nhà hàng lớn xuất hóa đơn tiếp khách doanh nghiệp |
+| Từ ngày 01/01/2028 | Bắt buộc XUẤT E-Rechnung cho hầu hết mọi doanh nghiệp (B2B) | Mọi giao dịch xuất hóa đơn giữa doanh nghiệp với doanh nghiệp phải dùng chuẩn điện tử cấu trúc |
+
+## Cuộc kiểm tra đột xuất Kassen-Nachschau và chiếc hộp đen TSE trong máy thu ngân
+
+Nếu như E-Rechnung quản lý đầu vào và giao dịch giữa các công ty, thì tại quầy thu ngân bán lẻ cho khách hàng cá nhân, vũ khí sắc bén nhất của Sở Thuế chính là thiết bị bảo mật kỹ thuật (TSE) kết hợp với quyền kiểm tra đột xuất máy tính tiền (Kassen-Nachschau). Chiếc mô-đun TSE nằm trong máy tính tiền của tiệm hoạt động không khác gì chiếc hộp đen trên máy bay: ngay từ giây phút nhân viên bấm món phở hay dịch vụ làm móng lên màn hình, rồi sau đó có bấm nút hủy món (Storno) hay mở ngăn kéo tiền, mọi thao tác đều được gắn chữ ký số và lưu cứng lại theo thứ tự thời gian.
+
+Theo quy định hiện hành, không chỉ bắt buộc phải trang bị TSE và in hóa đơn trao tay khách hàng (Belegausgabepflicht), mọi chiếc máy tính tiền điện tử hay hệ thống iPad thu ngân tại tiệm đều phải được đăng ký số sê-ri và mã số TSE lên cổng thông tin thuế điện tử ELSTER. Khi một thanh tra viên của Sở Thuế bất ngờ xuất trình thẻ công vụ tại quầy trong một đợt Kassen-Nachschau, họ sẽ kiểm tra ngay ba thứ: máy thu ngân này đã được khai báo trên hệ thống ELSTER chưa, chứng chỉ TSE còn hoạt động hay đã hết hạn, và số tiền mặt thực tế nằm trong ngăn kéo lúc đó có khớp tuyệt đối với báo cáo kết sổ (Kassensturz) trong máy hay không.
+
+## Ba việc chủ tiệm người Việt nên làm ngay để ngủ ngon trước mọi đợt thanh tra
+
+Sai lầm đắt giá nhất trong mắt cơ quan thuế Đức không phải là việc bạn kinh doanh lãi ít hay lãi nhiều, mà là việc hệ thống sổ sách tiền mặt bị đánh giá là "không đáng tin cậy về mặt hình thức" (formell nicht ordnungsgemäß). Một khi bị kết luận như vậy, Sở Thuế có toàn quyền bác bỏ sổ sách của tiệm và áp dụng biện pháp ấn định cộng thêm doanh thu (Hinzuschätzung) thêm hàng chục nghìn euro mỗi năm kèm lãi phạt.
+
+Để bảo vệ thành quả lao động vất vả của gia đình, các chủ cơ sở nên thực hiện ngay ba bước kiểm tra đơn giản:
+
+- **Kiểm tra hạn sử dụng của thẻ TSE:** Nhiều thiết bị TSE lắp đặt từ đợt đầu năm 2020-2021 có thời hạn chứng chỉ bảo mật là 3 năm hoặc 5 năm. Hãy gọi ngay cho đơn vị cung cấp máy tính tiền để kiểm tra xem chứng chỉ TSE trên máy còn hiệu lực hay cần gia hạn, đồng thời lấy giấy xác nhận đã khai báo máy lên cổng ELSTER lưu vào cặp hồ sơ tại quầy.
+- **Lập hộp thư điện tử riêng chuyên nhận hóa đơn và lưu trữ gốc:** Hãy tạo một địa chỉ email riêng (ví dụ rechnung@...) gửi cho các nhà cung cấp và kết nối thẳng với phần mềm kế toán (như DATEV Unternehmen online hoặc Lexoffice) theo hướng dẫn của cố vấn thuế. Tuyệt đối không chỉ in hóa đơn E-Rechnung ra giấy rồi xóa mất tệp tin điện tử gốc trong email, vì luật bắt buộc phải lưu trữ đúng tệp dữ liệu gốc đó trong suốt 8 đến 10 năm.
+- **Viết sổ quỹ tiền mặt (Kassenbuch) cuối ngày trung thực:** Tuyệt đối không để tiền cá nhân lẫn lộn trong ngăn kéo thu ngân và luôn giải trình rõ các lệnh hủy món (Storno). Một hệ thống thu ngân minh bạch từ những điều nhỏ nhất chính là tấm khiên vững chắc nhất bảo vệ tiệm của bạn trên đất Đức. Chúc bà con buôn may bán đắt và luôn vững vàng trước mọi thay đổi của luật thuế.`,
+    hoursAgo: 44,
+  },
+  {
+    slug: "tu-buergergeld-den-grundsicherung-moi-thay-doi-gi",
+    title: "Từ trợ cấp Bürgergeld sang chế độ Grundsicherung mới: những chiếc van nào đang được siết chặt",
+    sapo: "Sau những cuộc tranh luận nảy lửa về gánh nặng ngân sách gần 50 tỷ euro mỗi năm, chính trường Berlin đang thúc đẩy cuộc cải tổ toàn diện để thay thế Bürgergeld bằng hệ thống trợ cấp cơ bản mới (Neue Grundsicherung). Trọng tâm của đợt cải cách nằm ở nguyên tắc 'có làm mới có hưởng' và chế tài cắt giảm mạnh tay với người từ chối việc làm.",
+    category: "chinh-tri",
+    kind: "feature",
+    relevance: 30,
+    lawStatus: "noi-cac",
+    audienceTargets: ["nguoi-di-lam", "gia-dinh", "cu-tru-quoc-tich"],
+    image: IMAGES.politics.src,
+    imageCredit: IMAGES.politics.credit,
+    tags: ["Bürgergeld", "Grundsicherung", "Jobcenter", "trợ cấp xã hội", "chính sách lao động"],
+    keyPoints: [
+      "Liên minh cầm quyền tại Berlin định hướng thay thế tên gọi và cơ chế của Bürgergeld bằng hệ thống đảm bảo sinh kế cơ bản mới (Neue Grundsicherung).",
+      "Người nhận trợ cấp trong độ tuổi lao động nếu từ chối công việc hợp lý mà không có lý do chính đáng có thể bị cắt giảm mạnh phần trợ cấp tiền mặt.",
+      "Người bỏ lỡ lịch hẹn nhiều lần liên tiếp tại Jobcenter sẽ đối mặt với chế tài khấu trừ trực tiếp ngay từ tháng kế tiếp.",
+      "Thời gian ân hạn bảo vệ tài sản tích lũy và chi phí nhà ở rộng rãi trong năm đầu tiên (Karenzzeit) đang được thu hẹp đáng kể.",
+    ],
+    vnImpact:
+      "Một bộ phận bà con người Việt đang tạm thời thất nghiệp, làm việc thu nhập thấp phải nhận trợ cấp bổ sung (Aufstocker) hoặc đang trong quá trình chuẩn bị hồ sơ nhập tịch, gia hạn thẻ cư trú dài hạn cần đặc biệt lưu ý: mọi lịch hẹn và thư yêu cầu từ Jobcenter phải được phản hồi nghiêm túc đúng hạn.",
+    glossary: [
+      {
+        term: "Bürgergeld / Neue Grundsicherung",
+        vi: "Trợ cấp công dân / Trợ cấp đảm bảo sinh kế cơ bản mới",
+        explain: "Khoản trợ cấp nhà nước dành cho người có khả năng lao động nhưng đang thất nghiệp hoặc thu nhập không đủ trang trải mức sống tối thiểu tại Đức.",
+      },
+      {
+        term: "Mitwirkungspflicht",
+        vi: "Nghĩa vụ hợp tác bắt buộc",
+        explain: "Trách nhiệm pháp lý buộc người nhận trợ cấp phải có mặt đúng lịch hẹn, khai báo trung thực mọi khoản thu nhập và nỗ lực tìm việc làm theo yêu cầu của Jobcenter.",
+      },
+      {
+        term: "Leistungsminderung (Sanktion)",
+        vi: "Chế tài cắt giảm trợ cấp",
+        explain: "Hình thức xử phạt trừ từ 10%, 30% cho đến toàn bộ khoản tiền sinh hoạt chuẩn hằng tháng (Regelsatz) khi người nhận trợ cấp vi phạm nghĩa vụ hợp tác.",
+      },
+    ],
+    body: `Nếu ai thường xuyên theo dõi các chương trình nghị luận tối Chủ nhật trên đài ARD hay ZDF suốt hơn một năm qua, chắc hẳn sẽ thấy không một từ khóa nào làm nóng nghị trường Berlin nhanh bằng từ "Bürgergeld". Được đưa vào áp dụng từ đầu năm 2023 để thay thế cho hệ thống Hartz IV vốn bị coi là quá khắc nghiệt, Bürgergeld ban đầu mang theo triết lý nhân văn: giảm bớt các hình phạt cắt tiền, tôn trọng người thất nghiệp và ưu tiên đào tạo nâng cao tay nghề để họ có việc làm bền vững lâu dài.
+
+Thế nhưng khi nền kinh tế Đức rơi vào giai đoạn tăng trưởng đình trệ, hàng loạt nhà hàng, xưởng bánh và công ty xây dựng treo biển tuyển người suốt nhiều tháng không ai ứng tuyển trong khi tổng chi phí ngân sách dành cho hơn 5,5 triệu người hưởng Bürgergeld vọt lên gần 50 tỷ euro mỗi năm, gió trên chính trường Berlin đã đổi chiều hoàn toàn.
+
+## Cuộc tranh luận về khoảng cách tiền lương (Lohnabstandsgebot)
+
+Nút thắt lớn nhất khiến khối bảo thủ CDU/CSU cũng như giới chủ doanh nghiệp phản ứng gay gắt nằm ở một khái niệm kinh tế rất đời thường: khoảng cách thu nhập giữa người dậy từ 6 giờ sáng đi làm và người ở nhà nhận trợ cấp. Khi cộng gộp khoản tiền sinh hoạt tiêu chuẩn (563 euro/tháng cho người độc thân), tiền thuê nhà và chi phí sưởi ấm do Jobcenter chi trả trọn gói, cùng các khoản miễn giảm phí nhà trẻ và truyền hình, tổng giá trị phúc lợi của một gia đình đông con đôi khi tiến sát mức lương thực nhận (Netto) của một người lao động phổ thông làm việc 40 giờ mỗi tuần.
+
+Bà con cứ hình dung hệ thống an sinh xã hội Đức giống như một chiếc lưới bảo hiểm căng dưới chân người leo núi. Chiếc lưới sinh ra là để đỡ những ai chẳng may trượt chân ngã xuống rồi giúp họ đứng dậy leo tiếp, chứ không phải để biến thành chiếc võng êm ái nằm nghỉ lâu dài trong khi những người đang leo núi bên trên phải gồng lưng giữ dây. Chính vì áp lực đó, lộ trình chuyển đổi từ Bürgergeld sang hệ thống Đảm bảo sinh kế cơ bản mới (Neue Grundsicherung) đang siết lại toàn bộ các chiếc van kiểm soát.
+
+| Khía cạnh quản lý | Cơ chế Bürgergeld giai đoạn đầu | Định hướng siết chặt trong Grundsicherung mới | Tác động thực tế tới người nhận |
+| :--- | :--- | :--- | :--- |
+| Nguyên tắc giới thiệu việc làm | Ưu tiên đi học nghề, đào tạo lại trước khi ép nhận việc phổ thông | Quay lại nguyên tắc "Ưu tiên nhận việc làm ngay" (Vermittlungsvorrang) | Nếu có sức khỏe, phải chấp nhận công việc phù hợp ngay cả khi trái ngành cũ |
+| Chế tài khi từ chối việc làm | Cắt giảm nhẹ theo từng nấc 10% - 30% trong thời gian ngắn | Có thể cắt giảm tới 30% ngay hoặc tạm dừng 100% tiền sinh hoạt chuẩn nếu cố tình từ chối | Áp lực tài chính rất lớn nếu từ chối lời mời làm việc do Jobcenter gửi tới |
+| Bỏ lỡ lịch hẹn tại Jobcenter | Nhắc nhở nhiều lần, mức trừ chỉ 10% | Siết chặt chế tài ngay khi bỏ hẹn liên tiếp không có giấy ốm hợp lệ | Không được phép phớt lờ thư mời (Einladung) của chuyên viên quản lý hồ sơ |
+| Kiểm tra tài sản & nhà ở | Ân hạn 12 tháng đầu (tài sản tới 40.000 €, nhà rộng vẫn được trả đủ) | Rút ngắn thời gian ân hạn, rà soát kỹ tài sản tiết kiệm và diện tích thuê nhà | Người mới nộp đơn phải kê khai minh bạch mọi tài khoản ngân hàng trong và ngoài nước |
+
+## Lưu ý đặc biệt với bà con người Việt đang nhận trợ cấp hoặc nhận bù lương (Aufstocker)
+
+Trong cộng đồng người Việt tại Đức, đại đa số bà con đều rất chịu thương chịu khó. Tuy nhiên, có không ít trường hợp gia đình đông con hoặc người lao động chỉ tìm được công việc bán thời gian (Teilzeit) nên thu nhập không đủ trang trải tiền thuê nhà đắt đỏ và phải nhận thêm một phần trợ cấp bổ sung từ Jobcenter (nhóm này được gọi là Aufstocker). Bên cạnh đó là các cô chú lớn tuổi sức khỏe suy giảm nhưng chưa đủ tuổi nghỉ hưu.
+
+Đối với những gia đình đang có hồ sơ tại Jobcenter, có ba nguyên tắc an toàn tuyệt đối cần ghi nhớ trong giai đoạn luật đang siết chặt:
+
+- **Tuyệt đối không để lỡ thư từ trong hòm thư:** Ở Đức, mọi quyết định hành chính của Jobcenter đều được gửi qua đường bưu điện truyền thống kèm thời hạn phản hồi rất ngắn. Nếu đi vắng dài ngày (như về Việt Nam thăm thân), bắt buộc phải xin phép nghỉ vắng mặt (Ortsabwesenheit) và được chuyên viên đồng ý trước khi bay. Việc tự ý bay về Việt Nam khi đang nhận trợ cấp mà không khai báo, khi bị phát hiện qua dấu xuất nhập cảnh trên hộ chiếu hoặc giao dịch thẻ ngân hàng, sẽ bị buộc hoàn trả toàn bộ tiền trợ cấp, cắt bảo hiểm y tế và thậm chí bị khởi tố hình sự về hành vi gian lận trợ cấp xã hội.
+- **Giấy nghỉ ốm thường (AU) đôi khi không đủ để vắng mặt buổi hẹn:** Khi đã có lịch hẹn trực tiếp tại Jobcenter, nếu bị ốm nặng không thể đi lại được, nhiều trường hợp cơ quan chức năng yêu cầu giấy xác nhận không đủ khả năng đi đường (Wegeunfähigkeitsbescheinigung) từ bác sĩ chứ không chỉ là tờ giấy nghỉ làm thông thường.
+- **Tác động dây chuyền sang hồ sơ cư trú và quốc tịch:** Mỗi tháng nhận trợ cấp từ Jobcenter đều được lưu vết trong hệ thống liên thông với Sở Ngoại kiều. Nếu bạn đang có kế hoạch xin thẻ định cư vĩnh viễn hoặc nộp đơn nhập quốc tịch Đức, việc thoát khỏi sự phụ thuộc vào Jobcenter càng sớm càng tốt chính là điều kiện tiên quyết để hồ sơ được duyệt.
+
+Nếu nhận được một quyết định cắt giảm trợ cấp mà bạn cho rằng có sự nhầm lẫn do rào cản ngôn ngữ hoặc giấy tờ thất lạc, đừng im lặng chịu thiệt: luật pháp Đức trao cho bạn quyền nộp đơn khiếu nại (Widerspruch) trong vòng một tháng kể từ ngày nhận thư. Chúc bà con luôn chủ động nắm bắt thông tin để bảo vệ quyền lợi hợp pháp và sớm ổn định công việc vững chắc.`,
+    hoursAgo: 52,
+  },
+  {
+    slug: "doan-tu-gia-dinh-bi-siet-ai-bi-anh-huong",
+    title: "Đức siết quy định đoàn tụ gia đình: ai thực sự bị ảnh hưởng và hồ sơ của người Việt nằm ở đâu",
+    sapo: "Mỗi khi báo chí Đức đăng dòng tít Chính phủ Liên bang hạn chế đoàn tụ gia đình (Familiennachzug), nhiều gia đình người Việt đang chờ bảo lãnh vợ, chồng hoặc con nhỏ từ Việt Nam sang lại đứng ngồi không yên. Bóc tách từng điều khoản trong Luật Cư trú giúp bà con phân biệt rõ đâu là diện bị tạm dừng và đâu là nút thắt thực sự cần tháo gỡ.",
+    category: "di-tru",
+    kind: "feature",
+    relevance: 31,
+    lawStatus: "co-hieu-luc",
+    audienceTargets: ["cu-tru-quoc-tich", "gia-dinh"],
+    image: IMAGES.community2.src,
+    imageCredit: IMAGES.community2.credit,
+    tags: ["đoàn tụ gia đình", "Familiennachzug", "visa Đức", "Aufenthaltsgesetz", "Đại sứ quán Đức"],
+    keyPoints: [
+      "Lệnh tạm dừng đoàn tụ gia đình mà Quốc hội Đức thông qua chỉ áp dụng riêng cho nhóm người tị nạn hưởng quy chế bảo hộ bổ sung (subsidiär Schutzberechtigte).",
+      "Công dân Đức, người Việt có thẻ định cư vĩnh viễn (Niederlassungserlaubnis), thẻ xanh EU (Blaue Karte) hoặc thẻ cư trú lao động hoàn toàn KHÔNG nằm trong diện bị cấm này.",
+      "Với người lao động tay nghề cao mới sang Đức theo luật mới, một số trường hợp còn được mở rộng quyền bảo lãnh cả cha mẹ ruột nếu tự lo được toàn bộ bảo hiểm y tế.",
+      "Nút thắt lớn nhất với hồ sơ đoàn tụ của người Việt hiện nay là thời gian thẩm tra giấy tờ hộ tịch và điều kiện diện tích nhà ở tối thiểu tại Đức.",
+    ],
+    vnImpact:
+      "Hơn 98% hồ sơ bảo lãnh đoàn tụ của người Việt tại Đức thuộc diện đoàn tụ với công dân Đức hoặc người có thẻ cư trú lao động/định cư hợp pháp. Bà con không nên hoang mang trước các tin đồn trên mạng xã hội, mà cần tập trung chuẩn bị chứng chỉ tiếng Đức A1, hợp đồng thuê nhà đủ mét vuông và bảng lương đạt chuẩn.",
+    glossary: [
+      {
+        term: "Familiennachzug (§§ 27–36 AufenthG)",
+        vi: "Đoàn tụ gia đình theo Luật Cư trú",
+        explain: "Chế định pháp lý bảo vệ quyền sum họp gia đình, cho phép vợ/chồng và con vị thành niên sang Đức sống cùng người đang cư trú hợp pháp.",
+      },
+      {
+        term: "Subsidiärer Schutz",
+        vi: "Quy chế bảo hộ bổ sung",
+        explain: "Diện cư trú nhân đạo dành cho người chạy loạn từ vùng chiến sự (như Syria, Afghanistan) chưa đủ tiêu chí tị nạn chính trị; đây mới là nhóm bị tạm dừng đoàn tụ.",
+      },
+      {
+        term: "Urkundenüberprüfung",
+        vi: "Thủ tục xác minh tính xác thực của giấy tờ hộ tịch",
+        explain: "Quy trình do cơ quan đại diện ngoại giao Đức tại Việt Nam thực hiện thông qua luật sư ủy thác để kiểm tra giấy khai sinh, giấy kết hôn khi có nghi vấn.",
+      },
+      {
+        term: "Ausreichender Wohnraum",
+        vi: "Diện tích nhà ở đủ tiêu chuẩn",
+        explain: "Điều kiện bắt buộc khi bảo lãnh người thân: thông thường pháp luật quy định tối thiểu 12 m² cho mỗi thành viên từ 6 tuổi trở lên và 10 m² cho trẻ dưới 6 tuổi.",
+      },
+    ],
+    body: `Cách đây vài hôm, một chị chủ tiệm hoa ở Leipzig nhắn tin hỏi phòng biên tập trong tâm trạng hết sức lo lắng: "Chồng chị có thẻ định cư vĩnh viễn ở Đức, hai vợ chồng vừa nộp hồ sơ bảo lãnh đứa con nhỏ từ Nghệ An sang ở Đại sứ quán Hà Nội được hai tháng. Hôm nay nghe người quen bảo nước Đức vừa ra luật đóng cửa cấm đoàn tụ gia đình trong hai năm, có đúng là hồ sơ của con chị sẽ bị trả về không?".
+
+Nỗi lo của chị cũng là tâm trạng chung của hàng nghìn gia đình người Việt mỗi khi đọc thấy những bản tin ngắn ngủi trên mạng xã hội dịch vội từ cụm từ tiếng Đức "Aussetzung des Familiennachzugs" (tạm dừng đoàn tụ gia đình). Trong luật pháp Đức, chỉ cần bỏ sót hai chữ định danh nhóm đối tượng phía sau là ý nghĩa của cả đạo luật đã bị hiểu sai đi một trăm tám mươi độ.
+
+## Phân biệt rõ ba chiếc làn xe hoàn toàn khác nhau trong Luật Cư trú Đức
+
+Để hiểu chính xác chính sách đoàn tụ gia đình tại Đức, bạn đọc hãy hình dung hệ thống xét duyệt của Sở Ngoại kiều giống như một trạm thu phí cao tốc có ba làn xe riêng biệt. Làn thứ nhất dành cho việc đoàn tụ với công dân Đức. Làn thứ hai dành cho việc đoàn tụ với người nước ngoài đang có thẻ cư trú hợp pháp (bao gồm thẻ định cư vĩnh viễn Niederlassungserlaubnis, thẻ xanh châu Âu Blaue Karte, thẻ cư trú lao động tay nghề hoặc học tập). Còn làn thứ ba dành riêng cho những người xin tị nạn chiến tranh chỉ được cấp "quy chế bảo hộ bổ sung" (subsidiär Schutzberechtigte).
+
+Đạo luật hạn chế mà Quốc hội Đức (Bundestag) biểu quyết thông qua chỉ hạ thanh chắn đóng cửa đối với làn xe thứ ba (nhóm bảo hộ bổ sung vốn chủ yếu đến từ các điểm nóng xung đột Trung Đông) nhằm giảm tải cho hệ thống nhà ở xã hội và trường học của các thành phố. Hai làn xe đầu tiên, nơi tập trung gần như 100% hồ sơ bảo lãnh vợ chồng và con cái của cộng đồng người Việt, hoàn toàn không bị đóng lại bởi quy định này.
+
+| Nhóm người bảo lãnh đang sống tại Đức | Trạng thái pháp lý hiện nay | Yêu cầu chứng chỉ tiếng Đức A1 với vợ/chồng | Yêu cầu chứng minh thu nhập & diện tích nhà |
+| :--- | :--- | :--- | :--- |
+| Người đã có Quốc tịch Đức | Được quyền bảo lãnh bình thường (Ưu tiên hiến định) | Bắt buộc có bằng A1 (trừ một số ngoại lệ đặc biệt) | Không bắt buộc chứng minh thu nhập/nhà ở, nhưng thực tế vẫn nên đảm bảo |
+| Người có Thẻ định cư vĩnh viễn / Thẻ lao động | Được quyền bảo lãnh bình thường | Bắt buộc có bằng A1 (Goethe / Telc / ÖSD) | Bắt buộc đủ thu nhập (không nhận Jobcenter) và đủ diện tích m² nhà ở |
+| Người giữ Thẻ Xanh EU (Blaue Karte) / Chuyên gia | Được ưu tiên giải quyết nhanh | Vợ/chồng được MIỄN chứng chỉ tiếng Đức A1 | Bắt buộc thu nhập cao theo chuẩn thẻ xanh; mở rộng cả quyền đón cha mẹ |
+| Người tị nạn diện Bảo hộ bổ sung | Bị tạm dừng đoàn tụ trong 2 năm | Áp dụng quy định hạn chế đặc biệt | Chỉ giải quyết các trường hợp nhân đạo đặc biệt nghiêm trọng |
+
+## Những rào cản thực sự đang làm chậm hồ sơ đoàn tụ của người Việt
+
+Khi đã yên tâm rằng cánh cửa luật pháp dành cho gia đình người Việt vẫn mở, chúng ta cần nhìn thẳng vào những lý do thực tế khiến một bộ hồ sơ đoàn tụ từ Việt Nam sang Đức hiện nay thường mất từ 6 tháng đến hơn 1 năm mới cầm được visa trên tay.
+
+Thách thức đầu tiên nằm ở bài toán nhà ở và thu nhập tại Đức. Theo quy tắc hành chính chung tại hầu hết các bang, căn hộ bạn đang thuê phải đảm bảo tối thiểu 12 mét vuông diện tích ở cho mỗi người trên 6 tuổi và 10 mét vuông cho trẻ dưới 6 tuổi, kèm theo xác nhận của chủ nhà (Wohnraumbescheinigung). Với mức thu nhập ròng (Netto), sau khi trừ đi tiền thuê nhà ấm (Warmmiete), số tiền còn lại của người bảo lãnh phải cao hơn định mức sinh hoạt tối thiểu cộng với khoản miễn trừ theo công thức của Sở Ngoại kiều. Nếu người đứng đơn bảo lãnh ở Đức đang phải nhận trợ cấp bù lương từ Jobcenter, hồ sơ của người thân ở Việt Nam gần như chắc chắn sẽ bị từ chối.
+
+Thách thức thứ hai là quy trình xác minh giấy tờ hộ tịch (Urkundenüberprüfung). Do hệ thống đăng ký hộ tịch tại Việt Nam không nằm trong danh sách miễn hợp pháp hóa lãnh sự và đôi khi có tình trạng đăng ký khai sinh muộn hoặc sửa đổi thông tin hộ tịch, Đại sứ quán Đức trong nhiều trường hợp sẽ yêu cầu thẩm tra thực địa thông qua luật sư ủy thác. Quy trình này vừa tốn kém lệ phí vài trăm euro, vừa kéo dài thời gian chờ đợi thêm từ 3 đến 5 tháng.
+
+## Lời khuyên để hồ sơ đi một mạch không bị trả về
+
+Để rút ngắn tối đa thời gian xa cách của gia đình, người ở Việt Nam nên đăng ký học và thi lấy chứng chỉ tiếng Đức A1 của viện Goethe hoặc Telc thật sớm, bởi chứng chỉ ngoại ngữ thiếu hoặc hết hiệu lực là lý do phổ biến nhất khiến hồ sơ bị gác lại ngay tại quầy tiếp nhận. Song song đó, người ở Đức cần chuẩn bị sẵn hợp đồng thuê nhà bản gốc, sao kê tiền thuê nhà 3 tháng gần nhất, bảng lương 6 tháng (hoặc quyết toán thuế nếu tự kinh doanh) và tuyệt đối tránh xa các dịch vụ cò mồi hứa hẹn "chạy suất hẹn khẩn cấp" hay làm giả giấy tờ nhà ở. Sự minh bạch và chuẩn bị kỹ lưỡng từng tờ giấy khai sinh, đăng ký kết hôn ngay từ đầu chính là con đường ngắn nhất để cả gia đình sớm đoàn viên dưới một mái nhà tại Đức. Chúc các gia đình đang chờ lịch hẹn sớm nhận được tin vui từ Đại sứ quán.`,
+    hoursAgo: 70,
+  },
+  {
+    slug: "nguoi-viet-o-duc-ba-the-he-mot-cong-dong",
+    title: "Ba thế hệ, một cộng đồng: nhìn lại hành trình hội nhập đáng tự hào của người Việt trên đất Đức",
+    sapo: "Từ những thuyền nhân được tàu Cap Anamur cứu vớt giữa biển khơi và những đoàn lao động hợp tác đặt chân tới Đông Đức cuối thập niên 1980, cho tới thế hệ bác sĩ, kỹ sư trẻ sinh ra tại Đức cùng làn sóng du học sinh mới: hơn 200.000 người gốc Việt đã dệt nên một câu chuyện hội nhập đặc biệt trong lòng xã hội Đức.",
+    category: "nguoi-viet",
+    kind: "feature",
+    relevance: 46,
+    lawStatus: null,
+    audienceTargets: ["cu-tru-quoc-tich", "gia-dinh", "du-hoc-hoc-nghe", "ho-kinh-doanh", "nguoi-di-lam"],
+    image: IMAGES.community.src,
+    imageCredit: IMAGES.community.credit,
+    tags: ["cộng đồng người Việt", "lịch sử hội nhập", "thế hệ thứ hai", "Vertragsarbeiter", "Cap Anamur"],
+    keyPoints: [
+      "Cộng đồng người gốc Việt tại CHLB Đức hiện ước tính trên 200.000 người, là một trong những cộng đồng gốc Á lớn và năng động nhất quốc gia này.",
+      "Lịch sử hình thành gắn liền với hai dòng chảy: thuyền nhân tị nạn tại Tây Đức từ năm 1979 và lao động hợp tác (Vertragsarbeiter) tại CHDC Đức từ năm 1980.",
+      "Các nghiên cứu giáo dục học tại Đức nhiều năm liền ghi nhận tỷ lệ học sinh gốc Việt theo học trường chuyên Gymnasium cao vượt trội so với mặt bằng chung.",
+      "Làn sóng thế hệ thứ ba gồm các kỹ sư công nghệ, học viên học nghề (Azubi) và điều dưỡng viên đang góp phần trực tiếp giải quyết bài toán thiếu hụt nhân lực của nước Đức.",
+    ],
+    vnImpact:
+      "Nhìn lại chặng đường gần nửa thế kỷ có mặt trên đất Đức không chỉ giúp thế hệ trẻ hiểu được những giọt mồ hôi của cha mẹ nơi xứ người, mà còn củng cố vị thế, tiếng nói của cộng đồng người Việt trong đời sống kinh tế, văn hóa và chính trị sở tại.",
+    glossary: [
+      {
+        term: "Vertragsarbeiter",
+        vi: "Lao động hợp tác theo hiệp định liên chính phủ",
+        explain: "Khoảng 60.000 công dân Việt Nam sang làm việc tại các xí nghiệp dệt may, cơ khí của Cộng hòa Dân chủ Đức (Đông Đức) trong thập niên 1980.",
+      },
+      {
+        term: "Kontingentflüchtlinge",
+        vi: "Người tị nạn theo hạn ngạch nhân đạo",
+        explain: "Quy chế pháp lý đặc biệt mà chính quyền Tây Đức dành cho hàng chục nghìn thuyền nhân Việt Nam được cứu vớt trên biển Đông từ năm 1979.",
+      },
+      {
+        term: "Bildungsaufstieg",
+        vi: "Sự thăng tiến xã hội thông qua con đường học vấn",
+        explain: "Thuật ngữ xã hội học báo chí Đức thường dùng khi viết về kỳ tích học tập của con em các gia đình nhập cư người Việt thế hệ thứ hai.",
+      },
+    ],
+    body: `Nếu đi dọc các thành phố từ Tây sang Đông nước Đức, từ Hannover, Frankfurt cho tới Berlin, Leipzig hay Dresden, người ta có thể cảm nhận sự hiện diện của người Việt qua những hình ảnh rất đỗi thân thuộc: một tiệm hoa tươi mở cửa sớm nhất khu phố ngay đầu ga tàu, một quán ăn châu Á đỏ đèn đến tận khuya, nhưng đồng thời cũng là những tấm biển tên bác sĩ chuyên khoa, luật sư, kiến trúc sư mang họ Nguyễn, Trần, Lê, Hoàng gắn trang trọng trước các tòa nhà văn phòng hiện đại.
+
+Ít có cộng đồng nhập cư nào tại CHLB Đức lại mang trong mình một lịch sử hình thành đặc biệt như người Việt: hai nửa cộng đồng đặt chân tới hai miền Đông - Tây nước Đức trong thời kỳ Chiến tranh Lạnh theo hai con đường hoàn toàn trái ngược, để rồi khi bức tường Berlin sụp đổ năm 1989, họ cùng gặp nhau trên một hành trình mưu sinh và vươn lên đầy nghị lực.
+
+## Hai cánh cửa lịch sử mở ra giữa lòng châu Âu
+
+Cánh cửa đầu tiên mở ra ở miền Tây nước Đức vào mùa hè năm 1979, khi nhà báo Rupert Neudeck cùng Ủy ban "Một con tàu cho Việt Nam" thuê chiếc tàu hàng Cap Anamur tiến vào biển Đông, cứu vớt hơn 10.000 thuyền nhân vượt biển. Thủ tướng bang Niedersachsen khi đó là ông Ernst Albrecht đã đi đầu trong quyết định tiếp nhận nhân đạo những người tị nạn đầu tiên. Được trao quy chế người tị nạn theo hạn ngạch (Kontingentflüchtlinge), nhận sự hỗ trợ học tiếng và nhà ở bài bản từ chính quyền Tây Đức, thế hệ này đã nhanh chóng ổn định cuộc sống tại các bang Nordrhein-Westfalen, Niedersachsen, Baden-Württemberg và Bayern.
+
+Cùng khoảng thời gian ấy, ở phía bên kia bức tường chia cắt, năm 1980 Chính phủ Cộng hòa Dân chủ Đức (CHDC Đức) và Việt Nam ký hiệp định hợp tác lao động. Tính đến năm 1989, đã có khoảng 60.000 người lao động Việt Nam (Vertragsarbeiter) sang làm việc trong các nhà máy dệt, xưởng lắp ráp cơ khí và công nghiệp nhẹ tại Đông Berlin, Karl-Marx-Stadt (nay là Chemnitz), Leipzig, Dresden và Erfurt. Khi bức tường Berlin bất ngờ sụp đổ và các xí nghiệp quốc doanh Đông Đức giải thể hàng loạt, những người ở lại rơi vào khoảng trống pháp lý và kinh tế vô cùng khắc nghiệt. Không vốn liếng, tiếng Đức hạn chế, họ đã bắt đầu từ những quầy bán quần áo ngoài trời giữa mùa đông tuyết trắng, những gánh hàng hoa và những quán ăn nhỏ để tự nuôi sống gia đình.
+
+| Giai đoạn & Thế hệ | Hoàn cảnh đặt chân tới nước Đức | Đặc điểm nghề nghiệp & Hội nhập | Dấu ấn tiêu biểu trong xã hội Đức |
+| :--- | :--- | :--- | :--- |
+| Nhánh Tây Đức (Từ 1979) | Thuyền nhân được cứu vớt và tiếp nhận nhân đạo | Kỹ thuật viên, công nhân lành nghề, thương mại, dịch vụ | Hội nhập pháp lý sớm, xây dựng các hội đoàn văn hóa lâu đời ở miền Tây |
+| Nhánh Đông Đức (1980–1990) | Lao động hợp tác theo hiệp định giữa hai nhà nước | Tự kinh doanh thương mại, chợ đầu mối, ẩm thực, dịch vụ làm đẹp | Hình thành các trung tâm thương mại lớn như Đồng Xuân (Berlin), Sapa/Thái Bình Dương |
+| Thế hệ thứ hai (Sinh ra/lớn lên ở Đức) | Con cái của thế hệ đầu tiên, thụ hưởng nền giáo dục Đức | Bác sĩ, kỹ sư, luật sư, nhà khoa học, nghệ sĩ, doanh nhân | Tỷ lệ đỗ trường chuyên Gymnasium vượt cả mức trung bình của học sinh bản xứ |
+| Làn sóng mới (2015 đến nay) | Du học sinh đại học, học viên học nghề (Azubi), điều dưỡng | Y tế - chăm sóc người cao tuổi, IT, kỹ thuật, khách sạn | Bổ sung nguồn nhân lực trẻ có trình độ cho nền kinh tế Đức đang già hóa |
+
+## Kỳ tích học đường của thế hệ thứ hai và tiếng nói của thế hệ mới
+
+Điều khiến các nhà xã hội học và báo chí lớn của Đức như *DIE ZEIT* hay *Frankfurter Allgemeine Zeitung* nhiều lần tốn giấy mực nghiên cứu chính là "phép màu giáo dục" (Bildungswunder) của con cái người Việt. Dù bố mẹ thuộc thế hệ thuyền nhân hay lao động hợp tác phải đứng bán hàng 12 tiếng mỗi ngày với vốn tiếng Đức bập bẹ, tỷ lệ học sinh gốc Việt bước vào bậc trung học hàn lâm (Gymnasium) để lấy bằng tú tài (Abitur) luôn vượt mức 50% đến 60%, cao hơn cả tỷ lệ trung bình của học sinh người Đức bản xứ.
+
+Đằng sau những tấm bằng bác sĩ y khoa, tiến sĩ sinh học hay kỹ sư phần mềm của thế hệ trẻ hôm nay là truyền thống hiếu học ngàn đời của người Việt và sự hy sinh thầm lặng của thế hệ cha mẹ. Giờ đây, thế hệ thứ hai ấy không còn chỉ thu mình trong việc học giỏi, làm chăm như câu thành ngữ "im lặng như người Việt" trước kia, mà họ bắt đầu lên tiếng mạnh mẽ hơn trên báo chí, văn chương, nghệ thuật và tham gia vào các hội đồng chính trị địa phương để bảo vệ quyền lợi chính đáng cho cộng đồng.
+
+Trong mười năm trở lại đây, một làn sóng thứ ba đang tiếp nối câu chuyện ấy: hàng chục nghìn bạn trẻ từ khắp các tỉnh thành Việt Nam bay sang Đức theo chương trình du học, đào tạo nghề kép (Duale Ausbildung) và đặc biệt là ngành điều dưỡng chăm sóc người cao tuổi. Tại nhiều bệnh viện và viện dưỡng lão ở Đức hôm nay, nụ cười tận tụy của những điều dưỡng viên trẻ người Việt đã trở thành chỗ dựa ấm áp cho biết bao bệnh nhân bản xứ. Ba thế hệ với ba xuất phát điểm khác nhau đang cùng nhau viết tiếp một chương mới: sống đàng hoàng, thượng tôn pháp luật, đóng góp trí tuệ cho quê hương thứ hai nhưng vẫn giữ trọn tiếng Việt và hương vị quê nhà trong mỗi bữa cơm gia đình. Chúc cộng đồng người Việt trên khắp 16 bang của nước Đức luôn đoàn kết, khỏe mạnh và ngày càng vững mạnh.`,
+    hoursAgo: 96,
+  },
+];
+
+export async function seedIfEmpty(): Promise<void> {
+  const [{ count }] = (
+    await db.execute<{ count: string }>(sql`select count(*)::text as count from articles where mode = 'editorial'`)
+  ).rows;
+
+  // Nếu chưa có bài editorial hoặc các bài seed cũ quá ngắn (< 2000 ký tự), cập nhật lên bản phân tích chuyên sâu mới nhất
+  const [{ minLen }] = (
+    await db.execute<{ minLen: string }>(
+      sql`select coalesce(min(length(body)), 0)::text as "minLen" from articles where mode = 'editorial'`,
+    )
+  ).rows;
+
+  if (Number(count) >= SEEDS.length && Number(minLen) > 2500) return;
+
+  const now = Date.now();
+  for (const { hoursAgo, ...s } of SEEDS) {
+    await db
+      .insert(articles)
+      .values({
+        ...s,
+        mode: "editorial",
+        sourceName: null,
+        sourceUrl: null,
+        views: Math.floor(240 + ((s.relevance ?? 10) * 41) % 900),
+        publishedAt: new Date(now - hoursAgo * 3600 * 1000),
+      })
+      .onConflictDoUpdate({
+        target: articles.slug,
+        set: {
+          title: s.title,
+          sapo: s.sapo,
+          body: s.body,
+          keyPoints: s.keyPoints,
+          vnImpact: s.vnImpact,
+          glossary: s.glossary ?? [],
+          lawStatus: s.lawStatus ?? null,
+          audienceTargets: s.audienceTargets ?? [],
+          image: s.image,
+          imageCredit: s.imageCredit,
+          tags: s.tags,
+        },
+      });
+  }
+}
