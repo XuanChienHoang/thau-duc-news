@@ -1,7 +1,7 @@
-import type { GlossaryItem, SourceRef } from "@/db/schema";
 import { BRAND } from "./brand";
 import { CATEGORIES, isCategory, type CategorySlug } from "./categories";
 import { type AudienceTarget, detectAudiences, detectLawStatus, type LawStatus } from "./classify";
+import { type GlossaryItem, type SourceRef } from "./storage";
 
 export type RewriteInput = {
   sourceName: string;

@@ -1,15 +1,12 @@
-import { desc, sql } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { db } from "@/db";
-import { articles, feedItems, ingestRuns, subscribers } from "@/db/schema";
 import { activeProvider } from "@/lib/ai";
 import { BRAND } from "@/lib/brand";
 import { CATEGORIES, getCategory } from "@/lib/categories";
-import { ensureSchema } from "@/lib/ensure-schema";
 import { formatDateTime, timeAgo } from "@/lib/format";
 import { isIngesting, queueStats } from "@/lib/ingest";
 import { getSource, SOURCES } from "@/lib/sources";
+import { getArticles, getFeedQueue, getIngestRuns, getSubscribers } from "@/lib/storage";
 import { ingestCustomUrlAction, prioritizeAction, runIngestAction, upgradeArticleAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -38,31 +35,26 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     );
   }
 
-  await ensureSchema();
   const provider = activeProvider();
   const geminiModel = process.env.GEMINI_MODEL || "gemini-3.8-flash";
   const hasPexels = Boolean(process.env.PEXELS_API_KEY);
 
-  const [runs, items, stats, subs, publishedList] = await Promise.all([
-    db.select().from(ingestRuns).orderBy(desc(ingestRuns.startedAt)).limit(6),
-    db.select().from(feedItems).orderBy(desc(feedItems.fetchedAt), desc(feedItems.relevance)).limit(60),
-    queueStats(),
-    db.select({ id: subscribers.id }).from(subscribers),
-    db
-      .select({
-        id: articles.id,
-        slug: articles.slug,
-        title: articles.title,
-        category: articles.category,
-        kind: articles.kind,
-        mode: articles.mode,
-        publishedAt: articles.publishedAt,
-        wordCount: sql<number>`array_length(regexp_split_to_array(${articles.body}, '[[:space:]]+'), 1)::int`,
-      })
-      .from(articles)
-      .orderBy(desc(articles.publishedAt))
-      .limit(25),
-  ]);
+  const runs = getIngestRuns().slice(-6).reverse();
+  const allQueue = getFeedQueue();
+  const items = allQueue.slice(-60).reverse();
+  const stats = await queueStats();
+  const subs = getSubscribers();
+  const articles = getArticles();
+  const publishedList = articles.slice(0, 25).map((a) => ({
+    id: a.id,
+    slug: a.slug,
+    title: a.title,
+    category: a.category,
+    kind: a.kind,
+    mode: a.mode,
+    publishedAt: a.publishedAt,
+    wordCount: a.body.split(/\s+/).filter(Boolean).length,
+  }));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
@@ -84,13 +76,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       {/* Status Cards */}
       <div className="mt-8 grid gap-4 md:grid-cols-4">
-        <div className={`rounded border p-5 md:col-span-2 ${provider ? "border-emerald-300 bg-emerald-50" : "border-amber-300 bg-amber-50"}`}>
+        <div
+          className={`rounded border p-5 md:col-span-2 ${
+            provider ? "border-emerald-300 bg-emerald-50" : "border-amber-300 bg-amber-50"
+          }`}
+        >
           <div className="kicker text-muted">Động cơ Biên tập & Đồ họa</div>
           <div className="mt-1 text-xl font-bold">
             {provider ? `AI Phân tích chuyên sâu (${provider === "gemini" ? geminiModel : provider})` : "Tin vắn tự động"}
           </div>
           <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">
-            Hình ảnh:{" "}
+            Mô hình: <strong>Git-backed Flat Storage (như PhytoCodex)</strong>. Hình ảnh:{" "}
             <strong>
               {provider ? "Gemini AI Photojournalism" : "Stock"} + {hasPexels ? "Pexels Live Search API" : "Kho ảnh chọn lọc"}
             </strong>{" "}
@@ -118,7 +114,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <span className="kicker text-accent">Biên tập theo yêu cầu</span>
         <h2 className="mt-1 font-serif text-2xl font-semibold">Dán link báo Đức bất kỳ → Viết bài phân tích chuyên sâu ngay</h2>
         <p className="mt-1 text-sm text-muted">
-          Dán đường dẫn từ tagesschau, DER SPIEGEL, ZEIT, FAZ, rbb24, Bundestag... Hệ thống sẽ tự động bóc tách dữ kiện, viết bài phân tích dài 1.000+ chữ theo giọng văn tòa soạn và tạo ảnh minh họa mới.
+          Dán đường dẫn từ tagesschau, DER SPIEGEL, ZEIT, FAZ, rbb24, Bundestag... Hệ thống sẽ tự động bóc tách dữ kiện, viết bài
+          phân tích dài 1.000+ chữ theo giọng văn tòa soạn và tạo ảnh minh họa mới.
         </p>
         <form action={ingestCustomUrlAction} className="mt-4 flex flex-col gap-3 sm:flex-row">
           <input type="hidden" name="token" value={token} />
@@ -129,7 +126,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             placeholder="https://www.tagesschau.de/inland/..."
             className="flex-1 rounded border border-rule bg-paper/50 px-4 py-2.5 text-sm outline-none focus:border-ink"
           />
-          <select name="category" className="rounded border border-rule bg-paper/50 px-3 py-2.5 text-sm font-medium outline-none">
+          <select
+            name="category"
+            className="rounded border border-rule bg-paper/50 px-3 py-2.5 text-sm font-medium outline-none"
+          >
             {CATEGORIES.map((c) => (
               <option key={c.slug} value={c.slug}>
                 {c.name}
@@ -142,8 +142,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </form>
       </section>
 
-      {/* Published Articles & One-Click Deep Upgrade */}
-      <h2 className="mt-10 font-serif text-2xl font-semibold">Bài đã xuất bản gần đây ({publishedList.length} bài)</h2>
+      {/* Published Articles */}
+      <h2 className="mt-10 font-serif text-2xl font-semibold">Bài đã xuất bản ({publishedList.length} bài)</h2>
       <div className="mt-3 overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full text-left text-[13px]">
           <thead className="bg-paper-2 text-[11px] uppercase tracking-wider text-muted">
@@ -197,8 +197,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {runs.map((r) => (
           <details key={r.id} className="rounded border border-rule bg-white p-4">
             <summary className="cursor-pointer text-sm">
-              <strong suppressHydrationWarning>{formatDateTime(r.startedAt)}</strong> · {r.mode} · +{r.fetched} tin · {r.created} bài{" "}
-              {r.finishedAt ? "" : "· đang chạy"}
+              <strong suppressHydrationWarning>{formatDateTime(r.startedAt)}</strong> · {r.mode} · +{r.fetched} tin · {r.created}{" "}
+              bài {r.finishedAt ? "" : "· đang chạy"}
             </summary>
             <pre className="mt-3 whitespace-pre-wrap text-[12px] text-muted">{r.log}</pre>
           </details>
@@ -206,7 +206,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {!runs.length && <p className="text-sm text-muted">Chưa có lượt quét nào.</p>}
       </div>
 
-      <h2 className="mt-10 font-serif text-2xl font-semibold">Tin thu thập từ báo Đức (60 mới nhất)</h2>
+      <h2 className="mt-10 font-serif text-2xl font-semibold">Tin thu thập từ báo Đức ({items.length} mới nhất)</h2>
       <div className="mt-3 overflow-x-auto rounded border border-rule bg-white">
         <table className="w-full text-left text-[13px]">
           <thead className="bg-paper-2 text-[11px] uppercase tracking-wider text-muted">
@@ -234,14 +234,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 <td className="p-3 text-muted">{getSource(i.sourceId)?.name ?? i.sourceId}</td>
                 <td className="p-3">{getCategory(i.category).short}</td>
                 <td className="p-3">
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS[i.status] ?? ""}`}>{i.status}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS[i.status] ?? ""}`}>
+                    {i.status}
+                  </span>
                 </td>
                 <td className="p-3">
                   {i.status !== "done" && (
                     <form action={prioritizeAction}>
                       <input type="hidden" name="token" value={token} />
                       <input type="hidden" name="id" value={i.id} />
-                      <button className="whitespace-nowrap text-[12px] font-semibold text-accent hover:underline">Ưu tiên đăng</button>
+                      <button className="whitespace-nowrap text-[12px] font-semibold text-accent hover:underline">
+                        Ưu tiên đăng
+                      </button>
                     </form>
                   )}
                 </td>

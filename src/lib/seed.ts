@@ -1,11 +1,28 @@
-import { sql } from "drizzle-orm";
-import { db } from "@/db";
-import { articles, type NewArticle } from "@/db/schema";
-import { IMAGES } from "./categories";
+import { IMAGES, type CategorySlug } from "./categories";
+import { type AudienceTarget, type LawStatus } from "./classify";
+import { type GlossaryItem } from "./storage";
 
-type Seed = Omit<NewArticle, "publishedAt"> & { hoursAgo: number };
+export type Seed = {
+  slug: string;
+  title: string;
+  sapo: string;
+  category: CategorySlug;
+  kind?: string;
+  featured?: boolean;
+  relevance?: number;
+  lawStatus?: LawStatus | null;
+  audienceTargets?: AudienceTarget[];
+  image: string;
+  imageCredit: string;
+  tags: string[];
+  keyPoints: string[];
+  vnImpact?: string | null;
+  glossary?: GlossaryItem[];
+  body: string;
+  hoursAgo: number;
+};
 
-const SEEDS: Seed[] = [
+export const SEEDS: Seed[] = [
   {
     slug: "hai-quoc-tich-nguoi-viet-o-duc-can-biet-gi",
     title: "Được giữ hai quốc tịch: người Việt ở Đức cần chuẩn bị gì trước khi nộp hồ sơ nhập tịch",
@@ -576,48 +593,3 @@ Trong mười năm trở lại đây, một làn sóng thứ ba đang tiếp n�
     hoursAgo: 96,
   },
 ];
-
-export async function seedIfEmpty(): Promise<void> {
-  const [{ count }] = (
-    await db.execute<{ count: string }>(sql`select count(*)::text as count from articles where mode = 'editorial'`)
-  ).rows;
-
-  // Nếu chưa có bài editorial hoặc các bài seed cũ quá ngắn (< 2000 ký tự), cập nhật lên bản phân tích chuyên sâu mới nhất
-  const [{ minLen }] = (
-    await db.execute<{ minLen: string }>(
-      sql`select coalesce(min(length(body)), 0)::text as "minLen" from articles where mode = 'editorial'`,
-    )
-  ).rows;
-
-  if (Number(count) >= SEEDS.length && Number(minLen) > 2500) return;
-
-  const now = Date.now();
-  for (const { hoursAgo, ...s } of SEEDS) {
-    await db
-      .insert(articles)
-      .values({
-        ...s,
-        mode: "editorial",
-        sourceName: null,
-        sourceUrl: null,
-        views: Math.floor(240 + ((s.relevance ?? 10) * 41) % 900),
-        publishedAt: new Date(now - hoursAgo * 3600 * 1000),
-      })
-      .onConflictDoUpdate({
-        target: articles.slug,
-        set: {
-          title: s.title,
-          sapo: s.sapo,
-          body: s.body,
-          keyPoints: s.keyPoints,
-          vnImpact: s.vnImpact,
-          glossary: s.glossary ?? [],
-          lawStatus: s.lawStatus ?? null,
-          audienceTargets: s.audienceTargets ?? [],
-          image: s.image,
-          imageCredit: s.imageCredit,
-          tags: s.tags,
-        },
-      });
-  }
-}

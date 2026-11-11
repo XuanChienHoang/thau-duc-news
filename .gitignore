@@ -34,3 +34,7 @@ public/images/generated/
 Thumbs.db
 .vscode/
 .idea/
+
+
+*.tsbuildinfo
+.next/
