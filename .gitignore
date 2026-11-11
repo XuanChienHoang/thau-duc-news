@@ -15,10 +15,15 @@ data/
 *.sqlite3
 *.db
 
-# Environment files
+# Environment files (strictly protected)
 .env
-.env*.local
+.env*
 !.env.example
+*.pem
+*.key
+*.cert
+*.p12
+*.id_rsa
 
 # Logs
 npm-debug.log*

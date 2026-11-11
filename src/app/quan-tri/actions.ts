@@ -8,7 +8,11 @@ import { getFeedQueue, saveFeedQueue } from "@/lib/storage";
 
 function authorized(formData: FormData) {
   const token = process.env.ADMIN_TOKEN;
-  return !token || formData.get("token") === token;
+  if (!token) {
+    // Trong production, nếu chưa cấu hình ADMIN_TOKEN thì từ chối toàn bộ để bảo mật
+    return process.env.NODE_ENV !== "production";
+  }
+  return formData.get("token") === token;
 }
 
 export async function runIngestAction(formData: FormData) {

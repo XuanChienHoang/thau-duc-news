@@ -24,13 +24,16 @@ const STATUS: Record<string, string> = {
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token = "" } = await searchParams;
   const required = process.env.ADMIN_TOKEN;
-  if (required && token !== required) {
+  const isProd = process.env.NODE_ENV === "production";
+
+  // Bảo vệ nghiêm ngặt: Trong production hoặc khi đã đặt ADMIN_TOKEN, bắt buộc phải khớp token
+  if ((isProd || required) && (!token || token !== required)) {
     return (
       <form className="mx-auto max-w-sm px-4 py-24">
         <h1 className="font-serif text-3xl font-semibold">Phòng biên tập {BRAND.name}</h1>
-        <p className="mt-2 text-sm text-muted">Nhập mã truy cập (ADMIN_TOKEN).</p>
-        <input name="token" type="password" className="mt-6 w-full rounded border border-rule bg-white px-4 py-3" />
-        <button className="mt-3 w-full rounded bg-ink py-3 font-semibold text-paper">Vào</button>
+        <p className="mt-2 text-sm text-muted">Trang quản trị nội bộ. Vui lòng nhập mã bảo mật truy cập.</p>
+        <input name="token" type="password" className="mt-6 w-full rounded border border-rule bg-white px-4 py-3" placeholder="Mã bảo mật (ADMIN_TOKEN)" required />
+        <button className="mt-3 w-full rounded bg-ink py-3 font-semibold text-paper">Đăng nhập</button>
       </form>
     );
   }

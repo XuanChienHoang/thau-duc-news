@@ -6,11 +6,17 @@ export const maxDuration = 300;
 /** Trigger a crawl. Protect with CRON_SECRET (?secret=... or Authorization: Bearer ...) when set. */
 async function handle(req: Request) {
   const secret = process.env.CRON_SECRET;
+  // Bắt buộc phải có secret khi chạy ở production để chống kẻ xấu gọi spam làm cạn kiệt quota API
+  if (process.env.NODE_ENV === "production" && !secret) {
+    return Response.json({ ok: false, error: "CRON_SECRET not configured on server" }, { status: 403 });
+  }
+
   if (secret) {
     const url = new URL(req.url);
     const given = url.searchParams.get("secret") || req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
     if (given !== secret) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
+
   const result = await runIngest();
   return Response.json({ ok: true, ...result });
 }
