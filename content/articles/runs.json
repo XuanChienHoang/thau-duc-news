@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": 1,
+    "startedAt": "2026-11-11T22:47:45.714Z",
+    "finishedAt": "2026-11-11T22:48:43.823Z",
+    "mode": "ai:gemini",
+    "fetched": 581,
+    "created": 6,
+    "log": "tagesschau (tagesschau-inland): 35 tin (32 đạt ngưỡng)\ntagesschau Wirtschaft (tagesschau-wirtschaft): 27 tin (19 đạt ngưỡng)\ntagesschau (tagesschau): 35 tin (15 đạt ngưỡng)\nZDFheute (zdfheute): 35 tin (16 đạt ngưỡng)\nDeutschlandfunk (dlf): 35 tin (20 đạt ngưỡng)\nDER SPIEGEL (spiegel): 30 tin (9 đạt ngưỡng)\nDER SPIEGEL Politik (spiegel-politik): 20 tin (17 đạt ngưỡng)\nZEIT ONLINE (zeit): 15 tin (4 đạt ngưỡng)\nZEIT Politik (zeit-politik): 15 tin (9 đạt ngưỡng)\nSüddeutsche Zeitung (sz): 15 tin (8 đạt ngưỡng)\nLỗi nguồn: Error: faz: HTTP 302\nLỗi nguồn: Error: faz-wirtschaft: HTTP 302\nHandelsblatt (handelsblatt): 35 tin (22 đạt ngưỡng)\nDeutsche Welle (dw): 35 tin (13 đạt ngưỡng)\nn-tv (ntv): 35 tin (9 đạt ngưỡng)\nBundesregierung (bundesregierung): 20 tin (1 đạt ngưỡng)\nrbb24 (Berlin & Brandenburg) (rbb24): 35 tin (25 đạt ngưỡng)\nMDR Aktuell (Sachsen · Thüringen · Sachsen-Anhalt) (mdr): 34 tin (26 đạt ngưỡng)\nNDR (Hamburg & Bắc Đức) (ndr): 35 tin (16 đạt ngưỡng)\nBR24 (Bayern) (br24): 35 tin (23 đạt ngưỡng)\nWDR (Nordrhein-Westfalen) (wdr): 35 tin (14 đạt ngưỡng)\nRadar Báo Đức · Cộng đồng Việt (radar-vietnam-de): 27 tin (18 đạt ngưỡng)\nRadar Báo Đức · Di trú & Quốc tịch (radar-migration-law): 19 tin (18 đạt ngưỡng)\nRadar Báo Đức · Thuế, Lương & Trợ cấp (radar-policy-economy): 17 tin (16 đạt ngưỡng)\nĐã thêm 581 tin mới vào hàng đợi, xuất bản 6 bài chuyên sâu (AI: gemini)."
+  }
+]
