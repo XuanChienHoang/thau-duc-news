@@ -71,7 +71,20 @@ export type IngestRun = {
   log: string | null;
 };
 
-const DATA_DIR = path.join(process.cwd(), "content", "articles");
+function resolveDataDir(): string {
+  const candidates = [
+    path.join(process.cwd(), "content", "articles"),
+    path.join(__dirname, "..", "..", "content", "articles"),
+    path.resolve(process.cwd(), "08_MEDIA", "german-news-aggregator-website", "content", "articles"),
+    path.resolve(__dirname, "..", "content", "articles"),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return candidates[0];
+}
+
+const DATA_DIR = resolveDataDir();
 const ARTICLES_FILE = path.join(DATA_DIR, "index.json");
 const QUEUE_FILE = path.join(DATA_DIR, "queue.json");
 const RUNS_FILE = path.join(DATA_DIR, "runs.json");

@@ -10,6 +10,7 @@ import { getCategory } from "@/lib/categories";
 import { AUDIENCE_GROUPS, LAW_STATUS_LABELS, type LawStatus } from "@/lib/classify";
 import { formatDateTime, readingMinutes } from "@/lib/format";
 import { getArticle, getMostRead, getRelated } from "@/lib/queries";
+import { getArticles } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 

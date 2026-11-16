@@ -218,9 +218,9 @@ async function doIngest(): Promise<IngestResult> {
     try {
       const ok = provider
         ? await publishWithAI(item, cluster.related, usedImages).catch(async (e) => {
-            log.push(`AI lỗi (${item.id}): ${String(e).slice(0, 140)} → dùng tin vắn`);
-            return publishBrief(item, usedImages);
-          })
+          log.push(`AI lỗi (${item.id}): ${String(e).slice(0, 140)} → dùng tin vắn`);
+          return publishBrief(item, usedImages);
+        })
         : await publishBrief(item, usedImages);
       item.status = ok ? "done" : "error";
       if (ok) created++;

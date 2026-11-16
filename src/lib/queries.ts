@@ -82,8 +82,14 @@ export async function getGuides(limit = 4): Promise<ArticleCard[]> {
 }
 
 export async function getArticle(slug: string): Promise<Article | null> {
+  if (!slug) return null;
+  const clean = decodeURIComponent(slug).trim().toLowerCase();
   const list = getArticles();
-  return list.find((a) => a.slug === slug) ?? null;
+  return (
+    list.find((a) => a.slug.toLowerCase() === clean) ??
+    list.find((a) => a.slug.toLowerCase().includes(clean) || clean.includes(a.slug.toLowerCase())) ??
+    null
+  );
 }
 
 export async function getRelated(a: Article, limit = 4): Promise<ArticleCard[]> {
