@@ -1,6 +1,6 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
-  if (process.env.DISABLE_AUTO_INGEST === "1") return;
+  if (process.env.ENABLE_LOCAL_CRON !== "1") return;
   if (process.env.NEXT_PHASE === "phase-production-build") return;
   const g = globalThis as typeof globalThis & { __nhipducTimer?: boolean };
   if (g.__nhipducTimer) return;

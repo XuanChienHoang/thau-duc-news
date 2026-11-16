@@ -22,6 +22,7 @@ const sans = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://thauduc.de"),
   title: {
     default: `${BRAND.name} — ${BRAND.tagline}`,
     template: `%s · ${BRAND.name}`,
@@ -32,6 +33,13 @@ export const metadata: Metadata = {
     siteName: BRAND.name,
     locale: "vi_VN",
     type: "website",
+    images: [IMAGES.reichstag.src],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BRAND.name} — ${BRAND.tagline}`,
+    description:
+      "Tin tức và phân tích chuyên sâu từ nước Đức bằng tiếng Việt dành cho cộng đồng người Việt tại Đức.",
     images: [IMAGES.reichstag.src],
   },
 };

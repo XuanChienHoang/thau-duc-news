@@ -1,14 +1,64 @@
 import { Fragment, type ReactNode } from "react";
+import { slugify } from "@/lib/format";
+
+export type TocHeading = {
+  id: string;
+  text: string;
+  level: 2 | 3;
+};
+
+export function extractHeadings(source: string): TocHeading[] {
+  const blocks = source
+    .replace(/\r/g, "")
+    .split(/\n{2,}/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+
+  const headings: TocHeading[] = [];
+  const used = new Set<string>();
+
+  for (const b of blocks) {
+    if (/^##\s+/.test(b)) {
+      const text = b.replace(/^##\s+/, "").replace(/\*\*/g, "").trim();
+      let id = slugify(text) || `muc-${headings.length + 1}`;
+      if (used.has(id)) id = `${id}-${headings.length + 1}`;
+      used.add(id);
+      headings.push({ id, text, level: 2 });
+    }
+  }
+  return headings;
+}
 
 function inline(text: string): ReactNode[] {
-  // Support **bold** and *italic*
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*\n]+\*)/g);
+  // Support **bold**, *italic*, `code`, and [label](https://...)
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*\n]+\*|`[^`\n]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g);
   return parts.map((p, i) => {
     if (p.startsWith("**") && p.endsWith("**")) {
       return <strong key={i}>{p.slice(2, -2)}</strong>;
     }
     if (p.startsWith("*") && p.endsWith("*") && p.length > 2) {
       return <em key={i}>{p.slice(1, -1)}</em>;
+    }
+    if (p.startsWith("`") && p.endsWith("`") && p.length > 2) {
+      return (
+        <code key={i} className="rounded bg-paper-2 px-1.5 py-0.5 font-mono text-[0.88em] text-ink">
+          {p.slice(1, -1)}
+        </code>
+      );
+    }
+    const linkMatch = /^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/.exec(p);
+    if (linkMatch) {
+      return (
+        <a
+          key={i}
+          href={linkMatch[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
+        >
+          {linkMatch[1]}
+        </a>
+      );
     }
     return <Fragment key={i}>{p}</Fragment>;
   });
@@ -32,7 +82,7 @@ function isSeparatorRow(cells: string[]): boolean {
   return cells.length > 0 && cells.every((c) => /^:?-{2,}:?$/.test(c));
 }
 
-/** Rich, safe editorial markdown renderer (paragraphs, ##/### headings, bullet lists, blockquotes, comparison tables). */
+/** Rich, safe editorial markdown renderer (paragraphs, ##/### headings, bullet & numbered lists, links, blockquotes, comparison tables). */
 export function Markdown({ source }: { source: string }) {
   const blocks = source
     .replace(/\r/g, "")
@@ -40,14 +90,33 @@ export function Markdown({ source }: { source: string }) {
     .map((b) => b.trim())
     .filter(Boolean);
 
+  const usedHeadingIds = new Set<string>();
+  let h2Index = 0;
+
   return (
     <div className="article-body">
       {blocks.map((b, i) => {
         if (/^###\s/.test(b)) {
-          return <h3 key={i}>{inline(b.replace(/^###\s+/, ""))}</h3>;
+          const rawText = b.replace(/^###\s+/, "");
+          const id = slugify(rawText) || `sub-${i}`;
+          return (
+            <h3 key={i} id={id} className="scroll-mt-24">
+              {inline(rawText)}
+            </h3>
+          );
         }
         if (/^##\s/.test(b)) {
-          return <h2 key={i}>{inline(b.replace(/^##\s+/, ""))}</h2>;
+          const rawText = b.replace(/^##\s+/, "");
+          const cleanText = rawText.replace(/\*\*/g, "").trim();
+          let id = slugify(cleanText) || `muc-${h2Index + 1}`;
+          if (usedHeadingIds.has(id)) id = `${id}-${h2Index + 1}`;
+          usedHeadingIds.add(id);
+          h2Index++;
+          return (
+            <h2 key={i} id={id} className="scroll-mt-24">
+              {inline(rawText)}
+            </h2>
+          );
         }
         if (/^#\s/.test(b)) return null;
 
@@ -109,6 +178,19 @@ export function Markdown({ source }: { source: string }) {
                 <li key={j}>{inline(l.replace(/^\s*[-*•]\s+/, ""))}</li>
               ))}
             </ul>
+          );
+        }
+
+        // Render Numbered list
+        if (lines.every((l) => /^\s*\d+[.)]\s+/.test(l))) {
+          return (
+            <ol key={i} className="my-5 list-decimal space-y-2.5 pl-6">
+              {lines.map((l, j) => (
+                <li key={j} className="pl-1">
+                  {inline(l.replace(/^\s*\d+[.)]\s+/, ""))}
+                </li>
+              ))}
+            </ol>
           );
         }
 

@@ -11,9 +11,16 @@ export async function subscribe(_prev: SubscribeState, formData: FormData): Prom
     return { ok: false, message: "Email chưa đúng định dạng." };
   }
 
-  const added = addSubscriber(email);
-  revalidatePath("/");
-  return added
-    ? { ok: true, message: "Cảm ơn bạn! Bản tin sáng sẽ đến hộp thư của bạn từ ngày mai." }
-    : { ok: true, message: "Email này đã đăng ký rồi – hẹn gặp bạn trong bản tin sáng." };
+  const status = addSubscriber(email);
+  if (status === "added") {
+    revalidatePath("/");
+    return { ok: true, message: "Cảm ơn bạn! Bản tin sáng sẽ đến hộp thư của bạn từ ngày mai." };
+  }
+  if (status === "exists") {
+    return { ok: true, message: "Email này đã đăng ký rồi – hẹn gặp bạn trong bản tin sáng." };
+  }
+  return {
+    ok: true,
+    message: "Hệ thống đã ghi nhận yêu cầu của bạn. Bản tin mới được cập nhật tự động 3 lần mỗi ngày trên trang chủ.",
+  };
 }

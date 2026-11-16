@@ -31,9 +31,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Generated images (large binary cache, will be generated dynamically or uploaded to CDN)
-public/images/generated/
-
 # OS / Editor files
 .DS_Store
 Thumbs.db

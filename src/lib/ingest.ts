@@ -163,7 +163,9 @@ async function doIngest(): Promise<IngestResult> {
     .slice(0, 80);
 
   const existingArticles = getArticles();
-  const seen = existingArticles.slice(0, 80).map((r) => tokens(r.sourceTitle || r.title));
+  const seen = existingArticles
+    .slice(0, 100)
+    .flatMap((r) => [tokens(r.sourceTitle || r.title), tokens(r.title)]);
   const usedImages = new Set<string>(existingArticles.map((r) => r.image).filter(Boolean));
 
   const limit = provider ? MAX_AI : MAX_AUTO;
@@ -173,11 +175,11 @@ async function doIngest(): Promise<IngestResult> {
   const allClusters: { primary: FeedItem; related: FeedItem[] }[] = [];
   for (const c of candidates) {
     const tk = tokens(c.title);
-    if (seen.some((s) => similarity(s, tk) >= 0.58)) {
+    if (seen.some((s) => similarity(s, tk) >= 0.38)) {
       dupes.push(c.id);
       continue;
     }
-    const existingCluster = allClusters.find((cluster) => similarity(tokens(cluster.primary.title), tk) >= 0.45);
+    const existingCluster = allClusters.find((cluster) => similarity(tokens(cluster.primary.title), tk) >= 0.35);
     if (existingCluster) {
       existingCluster.related.push(c);
       dupes.push(c.id);

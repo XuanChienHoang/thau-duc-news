@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { after } from "next/server";
 import { BriefItem, LeadStory, SectionHeading, StoryCard, StoryRow, TextStory } from "@/components/cards";
 import { NewsletterForm } from "@/components/client-bits";
 import { AudienceFilterBar, LawTimeline, Ticker } from "@/components/home-widgets";
 import { BRAND } from "@/lib/brand";
 import { AUDIENCE_GROUPS, type AudienceTarget } from "@/lib/classify";
-import { maybeIngest } from "@/lib/ingest";
 import { getGuides, getLatest, getLead, getMostRead, type ArticleCard } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +13,6 @@ type HomeProps = {
 };
 
 export default async function HomePage({ searchParams }: HomeProps) {
-  after(() => maybeIngest());
-
   const params = await searchParams;
   const activeAudience = AUDIENCE_GROUPS.find((g) => g.slug === params?.["doi-tuong"])?.slug ?? null;
 

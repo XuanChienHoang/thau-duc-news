@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CatLabel, StoryCard, StoryRow } from "@/components/cards";
 import { ArticleAudioPlayer, ReadingProgress, ShareBar, ViewTracker } from "@/components/client-bits";
-import { Markdown } from "@/components/markdown";
+import { Markdown, extractHeadings } from "@/components/markdown";
+import { SafeImage } from "@/components/safe-image";
 import { BRAND } from "@/lib/brand";
 import { getCategory } from "@/lib/categories";
 import { AUDIENCE_GROUPS, LAW_STATUS_LABELS, type LawStatus } from "@/lib/classify";
@@ -32,6 +33,7 @@ export default async function ArticlePage({ params }: Props) {
   const [related, mostRead] = await Promise.all([getRelated(a, 4), getMostRead(5)]);
   const cat = getCategory(a.category);
   const minutes = readingMinutes(`${a.sapo} ${a.body}`);
+  const toc = extractHeadings(a.body);
   const lawBadge = a.lawStatus && a.lawStatus in LAW_STATUS_LABELS ? LAW_STATUS_LABELS[a.lawStatus as LawStatus] : null;
   const audiences = AUDIENCE_GROUPS.filter((g) => (a.audienceTargets ?? []).includes(g.slug));
   const sourcesList =
@@ -41,8 +43,36 @@ export default async function ArticlePage({ params }: Props) {
         ? [{ name: a.sourceName || "Báo chí Đức", url: a.sourceUrl, title: a.sourceTitle || a.title }]
         : [];
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://thauduc.de";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: a.title,
+    description: a.sapo,
+    image: a.image.startsWith("http") ? [a.image] : [`${siteUrl}${a.image}`],
+    datePublished: a.publishedAt,
+    dateModified: a.publishedAt,
+    articleSection: cat.name,
+    inLanguage: "vi-VN",
+    author: {
+      "@type": "Organization",
+      name: BRAND.byline,
+      url: siteUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: BRAND.name,
+      url: siteUrl,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/bai-viet/${a.slug}`,
+    },
+  };
+
   return (
     <article className="pb-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <ReadingProgress />
       <ViewTracker slug={a.slug} />
 
@@ -104,8 +134,7 @@ export default async function ArticlePage({ params }: Props) {
 
       <figure className="mx-auto mt-8 max-w-5xl md:px-4">
         <div className="relative aspect-[16/9] overflow-hidden bg-paper-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={a.image} alt={a.title} className="absolute inset-0 h-full w-full object-cover" />
+          <SafeImage src={a.image} alt={a.title} loading="eager" />
         </div>
         <figcaption className="mt-2.5 px-4 text-[12.5px] text-muted md:px-0">
           Hình minh họa biên tập độc lập, không sử dụng ảnh của cơ quan báo chí gốc. {a.imageCredit}.
@@ -129,6 +158,22 @@ export default async function ArticlePage({ params }: Props) {
                 ))}
               </ol>
             </section>
+          )}
+
+          {toc.length >= 2 && (
+            <nav aria-label="Mục lục bài viết" className="mb-8 rounded-sm border border-rule bg-paper-2/50 px-5 py-4">
+              <div className="kicker mb-2.5 text-muted">Trong bài phân tích này</div>
+              <ul className="space-y-1.5 text-[14px]">
+                {toc.map((h, idx) => (
+                  <li key={h.id}>
+                    <a href={`#${h.id}`} className="flex items-baseline gap-2 text-ink-2 transition hover:text-accent">
+                      <span className="font-mono text-[11.5px] font-bold text-accent/75">0{idx + 1}</span>
+                      <span className="hover:underline">{h.text}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
 
           <Markdown source={a.body} />

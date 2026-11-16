@@ -3,6 +3,7 @@ import { getCategory } from "@/lib/categories";
 import { LAW_STATUS_LABELS, type LawStatus } from "@/lib/classify";
 import { formatTime, timeAgo } from "@/lib/format";
 import type { ArticleCard } from "@/lib/queries";
+import { SafeImage } from "./safe-image";
 
 export function CatLabel({ category, light = false }: { category: string; light?: boolean }) {
   const c = getCategory(category);
@@ -61,8 +62,7 @@ export function Meta({ a, light = false }: { a: ArticleCard; light?: boolean }) 
 function Img({ a, className = "", ratio = "aspect-[3/2]" }: { a: ArticleCard; className?: string; ratio?: string }) {
   return (
     <div className={`img-zoom relative overflow-hidden bg-paper-2 ${ratio} ${className}`}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={a.image} alt={a.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      <SafeImage src={a.image} alt={a.title} loading="lazy" />
     </div>
   );
 }

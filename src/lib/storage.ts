@@ -77,72 +77,111 @@ const QUEUE_FILE = path.join(DATA_DIR, "queue.json");
 const RUNS_FILE = path.join(DATA_DIR, "runs.json");
 const SUBS_FILE = path.join(DATA_DIR, "subscribers.json");
 
-function ensureFiles() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+function isReadOnlyError(err: unknown): boolean {
+  const code = (err as { code?: string })?.code;
+  return code === "EROFS" || code === "EACCES" || code === "EPERM";
+}
 
-  if (!fs.existsSync(ARTICLES_FILE)) {
-    const now = Date.now();
-    let idCounter = 1;
-    const initial: Article[] = SEEDS.map((s: any) => ({
-      id: idCounter++,
-      slug: s.slug,
-      title: s.title,
-      sapo: s.sapo,
-      body: s.body,
-      keyPoints: s.keyPoints || [],
-      vnImpact: s.vnImpact || null,
-      glossary: s.glossary || [],
-      lawStatus: s.lawStatus || null,
-      audienceTargets: s.audienceTargets || [],
-      imagePrompt: null,
-      sourcesJson: [],
-      category: s.category,
-      tags: s.tags || [],
-      image: s.image,
-      imageCredit: s.imageCredit,
-      sourceName: null,
-      sourceUrl: null,
-      sourceTitle: null,
-      kind: s.kind || "feature",
-      mode: "editorial",
-      relevance: s.relevance || 30,
-      featured: s.featured || false,
-      views: Math.floor(250 + (idCounter * 41) % 600),
-      feedItemId: null,
-      publishedAt: new Date(now - (s.hoursAgo || 1) * 3600 * 1000).toISOString(),
-      createdAt: new Date().toISOString(),
-    }));
-    fs.writeFileSync(ARTICLES_FILE, JSON.stringify(initial, null, 2), "utf-8");
-  }
-
-  if (!fs.existsSync(QUEUE_FILE)) {
-    fs.writeFileSync(QUEUE_FILE, JSON.stringify([], null, 2), "utf-8");
-  }
-
-  if (!fs.existsSync(RUNS_FILE)) {
-    fs.writeFileSync(RUNS_FILE, JSON.stringify([], null, 2), "utf-8");
-  }
-
-  if (!fs.existsSync(SUBS_FILE)) {
-    fs.writeFileSync(SUBS_FILE, JSON.stringify([], null, 2), "utf-8");
+function safeWriteJson(filePath: string, data: unknown): boolean {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+    return true;
+  } catch (err) {
+    if (isReadOnlyError(err)) {
+      return false;
+    }
+    throw err;
   }
 }
+
+function buildInitialSeeds(): Article[] {
+  const now = Date.now();
+  let idCounter = 1;
+  return SEEDS.map((s) => ({
+    id: idCounter++,
+    slug: s.slug,
+    title: s.title,
+    sapo: s.sapo,
+    body: s.body,
+    keyPoints: s.keyPoints || [],
+    vnImpact: s.vnImpact || null,
+    glossary: s.glossary || [],
+    lawStatus: s.lawStatus || null,
+    audienceTargets: s.audienceTargets || [],
+    imagePrompt: null,
+    sourcesJson: [],
+    category: s.category,
+    tags: s.tags || [],
+    image: s.image,
+    imageCredit: s.imageCredit,
+    sourceName: null,
+    sourceUrl: null,
+    sourceTitle: null,
+    kind: s.kind || "feature",
+    mode: "editorial",
+    relevance: s.relevance || 30,
+    featured: s.featured || false,
+    views: Math.floor(250 + (idCounter * 41) % 600),
+    feedItemId: null,
+    publishedAt: new Date(now - (s.hoursAgo || 1) * 3600 * 1000).toISOString(),
+    createdAt: new Date().toISOString(),
+  }));
+}
+
+function ensureFiles() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(ARTICLES_FILE)) {
+      safeWriteJson(ARTICLES_FILE, buildInitialSeeds());
+    }
+    if (!fs.existsSync(QUEUE_FILE)) {
+      safeWriteJson(QUEUE_FILE, []);
+    }
+    if (!fs.existsSync(RUNS_FILE)) {
+      safeWriteJson(RUNS_FILE, []);
+    }
+    if (!fs.existsSync(SUBS_FILE)) {
+      safeWriteJson(SUBS_FILE, []);
+    }
+  } catch (err) {
+    if (!isReadOnlyError(err)) {
+      console.error("[storage] ensureFiles error:", err);
+    }
+  }
+}
+
+const gCache = globalThis as typeof globalThis & {
+  __thauducArticlesCache?: { mtimeMs: number; items: Article[] };
+};
 
 export function getArticles(): Article[] {
   ensureFiles();
   try {
+    if (!fs.existsSync(ARTICLES_FILE)) {
+      return buildInitialSeeds();
+    }
+    const stat = fs.statSync(ARTICLES_FILE);
+    if (gCache.__thauducArticlesCache && gCache.__thauducArticlesCache.mtimeMs === stat.mtimeMs) {
+      return gCache.__thauducArticlesCache.items;
+    }
     const raw = fs.readFileSync(ARTICLES_FILE, "utf-8");
-    return JSON.parse(raw) as Article[];
+    const items = JSON.parse(raw) as Article[];
+    gCache.__thauducArticlesCache = { mtimeMs: stat.mtimeMs, items };
+    return items;
   } catch {
-    return [];
+    return buildInitialSeeds();
   }
 }
 
-export function saveArticles(items: Article[]): void {
+export function saveArticles(items: Article[]): boolean {
   ensureFiles();
-  fs.writeFileSync(ARTICLES_FILE, JSON.stringify(items, null, 2), "utf-8");
+  const ok = safeWriteJson(ARTICLES_FILE, items);
+  if (ok) {
+    gCache.__thauducArticlesCache = undefined;
+  }
+  return ok;
 }
 
 export function getFeedQueue(): FeedItem[] {
@@ -155,9 +194,9 @@ export function getFeedQueue(): FeedItem[] {
   }
 }
 
-export function saveFeedQueue(items: FeedItem[]): void {
+export function saveFeedQueue(items: FeedItem[]): boolean {
   ensureFiles();
-  fs.writeFileSync(QUEUE_FILE, JSON.stringify(items, null, 2), "utf-8");
+  return safeWriteJson(QUEUE_FILE, items);
 }
 
 export function getIngestRuns(): IngestRun[] {
@@ -170,9 +209,9 @@ export function getIngestRuns(): IngestRun[] {
   }
 }
 
-export function saveIngestRuns(runs: IngestRun[]): void {
+export function saveIngestRuns(runs: IngestRun[]): boolean {
   ensureFiles();
-  fs.writeFileSync(RUNS_FILE, JSON.stringify(runs, null, 2), "utf-8");
+  return safeWriteJson(RUNS_FILE, runs);
 }
 
 export function getSubscribers(): { id: number; email: string; createdAt: string }[] {
@@ -185,17 +224,16 @@ export function getSubscribers(): { id: number; email: string; createdAt: string
   }
 }
 
-export function addSubscriber(email: string): boolean {
+export function addSubscriber(email: string): "added" | "exists" | "readonly" {
   ensureFiles();
   const list = getSubscribers();
   if (list.some((s) => s.email.toLowerCase() === email.toLowerCase())) {
-    return false;
+    return "exists";
   }
   list.push({
     id: list.length + 1,
     email: email.toLowerCase(),
     createdAt: new Date().toISOString(),
   });
-  fs.writeFileSync(SUBS_FILE, JSON.stringify(list, null, 2), "utf-8");
-  return true;
+  return safeWriteJson(SUBS_FILE, list) ? "added" : "readonly";
 }
